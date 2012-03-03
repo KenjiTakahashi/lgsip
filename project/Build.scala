@@ -4,8 +4,11 @@ import Keys._
 
 object Build extends sbt.Build {
     val system = getProperty("os.name")
-    val unmanagedListing = unmanagedJars in Compile += {
-        if(system == "Linux") Attributed.blank(file("/usr/share/java/swt.jar")) else null
+    lazy val lgsis = Project("lgsis", file("."))
+    if(system == "Linux") {
+        val unmanagedListing = unmanagedJars in Compile += {
+            Attributed.blank(file("/usr/share/java/swt.jar"))
+        }
+        lgsis.settings(unmanagedListing)
     }
-    lazy val lgsis = Project("lgsis", file(".")).settings(unmanagedListing)
 }
