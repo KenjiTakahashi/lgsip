@@ -6,3 +6,6 @@ extends Exception("You need to have at least 2 inputs for a gate.") {}
 
 class NegativeNumOfInputsException
 extends Exception("Number of inputs to add/remove should be positive.") {}
+
+class InvalidInputIndexException
+extends Exception("The specified input does not exist.") {}

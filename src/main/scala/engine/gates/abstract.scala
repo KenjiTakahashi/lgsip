@@ -20,7 +20,13 @@ abstract class Gate {
         recompute()
     }
     def changeInput(index : Int, value : Boolean) {
-        inputs(index) = value // need to catch exception here
+        try {
+            inputs(index) = value
+        } catch {
+            case _: IndexOutOfBoundsException => {
+                throw new InvalidInputIndexException()
+            }
+        }
         recompute()
     }
     def compute : Boolean
