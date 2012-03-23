@@ -1,6 +1,7 @@
 package lgsis.engine
 package gates
 
+import exceptions._
 import collection.mutable.ArrayBuffer
 
 abstract class Gate {
@@ -8,13 +9,13 @@ abstract class Gate {
     var output = false
 
     def addInputs(number : Int) {
-        if(number < 1) return // throw exception
+        if(number < 1) throw new NegativeNumOfInputsException()
         inputs ++= new Array[Boolean](number)
         recompute()
     }
     def removeInputs(number : Int) {
-        if(number < 1) return // throw exception
-        if(inputs.size - number < 2) return // as above
+        if(number < 1) throw new NegativeNumOfInputsException()
+        if(inputs.size - number < 2) throw new NotEnoughInputsException()
         inputs.trimEnd(number)
         recompute()
     }
