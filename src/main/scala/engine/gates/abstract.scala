@@ -38,3 +38,7 @@ abstract class Gate {
         }
     }
 }
+
+abstract class BasicGate extends Gate
+
+abstract class IOGate extends Gate

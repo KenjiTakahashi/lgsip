@@ -12,3 +12,6 @@ extends Exception("The specified input does not exist.")
 
 class WireExistsException
 extends Exception("The specified wire already exists.")
+
+class IOConnectedException
+extends Exception("The specified input/output is already connected.")
