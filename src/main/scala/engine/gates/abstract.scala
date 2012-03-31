@@ -7,6 +7,7 @@ import collection.mutable.ArrayBuffer
 abstract class Gate {
     val inputs = ArrayBuffer[Boolean]()
     var output = false
+    val wires = ArrayBuffer[(Gate, Int)]()
 
     def addInputs(number : Int) {
         if(number < 1) throw new NegativeNumOfInputsException()
@@ -19,7 +20,7 @@ abstract class Gate {
         inputs.trimEnd(number)
         recompute()
     }
-    def changeInput(index : Int, value : Boolean) {
+    protected def changeInput(index : Int, value : Boolean) {
         try {
             inputs(index) = value
         } catch {
@@ -30,12 +31,19 @@ abstract class Gate {
         recompute()
     }
     def compute : Boolean
-    private def recompute() {
-        val new_output = compute
-        if(new_output != output) {
-            output = new_output
-            // notify somehow
-        }
+    protected def recompute() {
+        output = compute
+        wires.foreach{case (g, n) => g.changeInput(n, output)}
+    }
+    def addWire(oGate : Gate, oNumber : Int) {
+        val wire = (oGate, oNumber)
+        if(wires.contains(wire)) throw new WireExistsException()
+        wires += wire
+        recompute()
+    }
+    def removeWire(oGate : Gate, oNumber : Int) {
+        wires -= ((oGate, oNumber))
+        recompute()
     }
 }
 

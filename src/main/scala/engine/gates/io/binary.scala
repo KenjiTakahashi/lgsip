@@ -2,9 +2,17 @@ package lgsis.engine
 package gates
 
 class BinaryInput(new_value : Boolean) extends IOGate {
-    var value = new_value
+    output = new_value
+
     def switch() {
-        value = !value
+        output = !output
+        recompute()
     }
-    override def compute : Boolean = value
+    override def compute : Boolean = output
+}
+
+class BinaryOutput extends IOGate {
+    inputs += false
+
+    override def compute : Boolean = inputs(0)
 }
