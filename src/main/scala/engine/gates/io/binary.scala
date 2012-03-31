@@ -14,6 +14,6 @@ class BinaryInput(new_value : Boolean) extends Gate {
 
 class BinaryOutput extends Gate {
     inputs += false
-
+    
     override def compute : Boolean = inputs(0)
 }

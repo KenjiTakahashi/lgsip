@@ -46,3 +46,8 @@ abstract class Gate {
         recompute()
     }
 }
+
+abstract class BasicGate(number : Int, name : String) extends Gate {
+    if(number < 2) throw new NotEnoughInputsException()
+    inputs ++= new Array[Boolean](number)
+}
