@@ -46,7 +46,3 @@ abstract class Gate {
         recompute()
     }
 }
-
-abstract class BasicGate extends Gate
-
-abstract class IOGate extends Gate
