@@ -3,51 +3,35 @@ package gates
 
 import exceptions._
 import collection.mutable.ArrayBuffer
+import commons.properties.Observable
 
 abstract class Gate {
-    val inputs = ArrayBuffer[Boolean]()
-    var output = false
-    val wires = ArrayBuffer[(Gate, Int)]()
+    val inputs = new Observable(ArrayBuffer[Boolean]())
 
     def addInputs(number : Int) {
         if(number < 1) throw new NegativeNumOfInputsException()
-        inputs ++= new Array[Boolean](number)
-        recompute()
+        inputs() ++= new Array[Boolean](number)
     }
     def removeInputs(number : Int) {
         if(number < 1) throw new NegativeNumOfInputsException()
-        if(inputs.size - number < 2) throw new NotEnoughInputsException()
-        inputs.trimEnd(number)
-        recompute()
+        if(inputs().size - number < 2) throw new NotEnoughInputsException()
+        inputs().trimEnd(number)
     }
-    protected def changeInput(index : Int, value : Boolean) {
+    def changeInput(index : Int, value : Boolean) {
         try {
-            inputs(index) = value
+            inputs()(index) = value
         } catch {
             case _: IndexOutOfBoundsException => {
                 throw new InvalidInputIndexException()
             }
         }
-        recompute()
     }
     def compute : Boolean
-    protected def recompute() {
-        output = compute
-        wires.foreach{case (g, n) => g.changeInput(n, output)}
-    }
-    def addWire(oGate : Gate, oNumber : Int) {
-        val wire = (oGate, oNumber)
-        if(wires.contains(wire)) throw new WireExistsException()
-        wires += wire
-        recompute()
-    }
-    def removeWire(oGate : Gate, oNumber : Int) {
-        wires -= ((oGate, oNumber))
-        recompute()
-    }
 }
 
 abstract class BasicGate(number : Int, name : String) extends Gate {
-    if(number < 2) throw new NotEnoughInputsException()
-    inputs ++= new Array[Boolean](number)
+    if(name != "Not" && number < 2) throw new NotEnoughInputsException()
+    inputs() ++= new Array[Boolean](number)
 }
+
+abstract class IOGate extends Gate
