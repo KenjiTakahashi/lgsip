@@ -3,9 +3,10 @@ package lgsis.engine
 import gates.{BasicGate, IOGate}
 import exceptions._
 import scala.collection.mutable.{Set, Map, ArrayBuffer}
+import java.lang.Thread
 import com.scaladudes.signal.connect
 
-class Circuit {
+class Circuit extends Thread {
     val wires = Map[BasicGate, Map[BasicGate, Int]]()
     .withDefaultValue(Map[BasicGate, Int]())
     val inputs = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
@@ -15,15 +16,13 @@ class Circuit {
     var currentGates = Set[BasicGate]()
     var running = false
 
-    def start() {
-        if(!running) {
-            running = true
-            while(running) {
-                step()
-            }
+    override def run() {
+        running = true
+        while(running) {
+            step()
         }
     }
-    def stop() {
+    def die() {
         running = false
     }
     def step() {
