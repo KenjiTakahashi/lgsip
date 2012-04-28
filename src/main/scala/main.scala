@@ -4,6 +4,7 @@ import engine.gates.basic._
 import engine.gates.io._
 import com.coconut_palm_software.xscalawt.XScalaWT._ // just checking if we really have XS(cala)WT
 import org.eclipse.swt.SWT // and SWT itself
+import com.scaladudes.signal.stopDispatcher
 
 object Main {
     def main(args: Array[String]) = {
@@ -128,5 +129,6 @@ object Main {
         println(jkq.compute)
         println(jknq.compute)
         println("-")
+        stopDispatcher()
     }
 }

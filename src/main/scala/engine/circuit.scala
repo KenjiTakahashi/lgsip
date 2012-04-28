@@ -3,7 +3,7 @@ package lgsis.engine
 import gates.{BasicGate, IOGate}
 import exceptions._
 import scala.collection.mutable.{Set, Map, ArrayBuffer}
-import commons.properties.Observable.observe
+import com.scaladudes.signal.connect
 
 class Circuit {
     val wires = Map[BasicGate, Map[BasicGate, Int]]()
@@ -13,7 +13,19 @@ class Circuit {
     val outputs = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
     .withDefaultValue(ArrayBuffer[(IOGate, Int)]())
     var currentGates = Set[BasicGate]()
+    var running = false
 
+    def start() {
+        if(!running) {
+            running = true
+            while(running) {
+                step()
+            }
+        }
+    }
+    def stop() {
+        running = false
+    }
     def step() {
         val currentGates_ = Set[BasicGate]()
         for(gate <- currentGates) {
@@ -27,8 +39,6 @@ class Circuit {
             } catch {
                 case _: NoSuchElementException =>
             }
-            //println(gate)
-            //println(gate.inputs())
             currentGates_ ++= wires(gate).keys
         }
         currentGates = currentGates_
@@ -44,13 +54,20 @@ class Circuit {
             }
         }
     }
-    def addWire(iGate : IOGate, iNumber : Int, oGate : BasicGate, oNumber : Int) {
+    def addWire(
+        iGate : IOGate,
+        iNumber : Int,
+        oGate : BasicGate,
+        oNumber : Int
+    ) {
         val iWire = (iGate, iNumber)
         val oWire = (oGate, oNumber)
         if(inputs.contains(iWire) && inputs(iWire).contains(oWire)) {
             throw new WireExistsException()
         }
-        observe(iGate.inputs) {values => stepInputs(iGate, values)}
+        connect[iGate.ValueChanged] {
+            case iGate.ValueChanged(i) => stepInputs(iGate, i)
+        }
         inputs(iWire) += oWire
         currentGates += oGate
     }
