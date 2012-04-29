@@ -7,5 +7,3 @@ libraryDependencies ++= Seq(
 )
 
 scalacOptions ++= Seq("-deprecation")
-
-parallelExecution in Test := false

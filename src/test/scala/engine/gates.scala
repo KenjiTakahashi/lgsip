@@ -78,5 +78,141 @@ class BasicGatesTest extends Specification {
             }
         }
     }
-    def is = new OrSpec ^ new AndSpec
+
+    trait NandPrepare extends Prepare with mutable.Before {
+        val nand = new Nand(2)
+        circuit.addWire(a, 0, nand, 0)
+        circuit.addWire(b, 0, nand, 1)
+        circuit.addWire(nand, out, 0)
+        def before = {}
+    }
+    class NandSpec extends mutable.Specification {
+        "The Nand gate" should {
+            "be false if any value is true" in new NandPrepare {
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+                b.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+            "be true if all values are false" in new NandPrepare {
+                circuit.step()
+                out.compute should beEqualTo(true)
+            }
+        }
+    }
+
+    trait NorPrepare extends Prepare with mutable.Before {
+        val nor = new Nor(2)
+        circuit.addWire(a, 0, nor, 0)
+        circuit.addWire(b, 0, nor, 1)
+        circuit.addWire(nor, out, 0)
+        def before = {}
+    }
+    class NorSpec extends mutable.Specification {
+        "The Nor gate" should {
+            "be true if all values are false" in new NorPrepare {
+                circuit.step()
+                out.compute should beEqualTo(true)
+            }
+            "be false if any value is true" in new NorPrepare {
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+                b.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+        }
+    }
+
+    trait XorPrepare extends Prepare with mutable.Before {
+        val xor = new Xor()
+        circuit.addWire(a, 0, xor, 0)
+        circuit.addWire(b, 0, xor, 1)
+        circuit.addWire(xor, out, 0)
+        def before = {}
+    }
+    class XorSpec extends mutable.Specification {
+        "The Xor gate" should {
+            "be false if both values are false" in new XorPrepare {
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+            "be false if both values are true" in new XorPrepare {
+                a.switch()
+                b.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+            "be true if one value is true and the other is false" in new XorPrepare {
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(true)
+                a.switch()
+                b.switch()
+                out.compute should beEqualTo(true)
+            }
+        }
+    }
+
+    trait XnorPrepare extends Prepare with mutable.Before {
+        var xnor = new Xnor()
+        circuit.addWire(a, 0, xnor, 0)
+        circuit.addWire(b, 0, xnor, 1)
+        circuit.addWire(xnor, out, 0)
+        def before = {}
+    }
+    class XnorSpec extends mutable.Specification {
+        "The Xnor gate" should {
+            "be true if both values are false" in new XnorPrepare {
+                circuit.step()
+                out.compute should beEqualTo(true)
+            }
+            "be true if both values are true" in new XnorPrepare {
+                a.switch()
+                b.switch()
+                circuit.step()
+                out.compute should beEqualTo(true)
+            }
+            "be false if one value in true and the other is false" in new XnorPrepare {
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+                a.switch()
+                b.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+        }
+    }
+
+    trait NotPrepare extends Prepare with mutable.Before {
+        var not = new Not()
+        circuit.addWire(a, 0, not, 0)
+        circuit.addWire(not, out, 0)
+        def before = {}
+    }
+    class NotSpec extends mutable.Specification {
+        "The Not gate" should {
+            "be true if value is false" in new NotPrepare {
+                circuit.step()
+                out.compute should beEqualTo(true)
+            }
+            "be false if value is true" in new NotPrepare {
+                a.switch()
+                circuit.step()
+                out.compute should beEqualTo(false)
+            }
+        }
+    }
+
+    def is = new OrSpec ^ new AndSpec ^ new NandSpec ^ new NorSpec
 }
