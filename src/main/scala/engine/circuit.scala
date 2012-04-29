@@ -8,11 +8,8 @@ import com.scaladudes.signal.connect
 
 class Circuit extends Thread {
     val wires = Map[BasicGate, Map[BasicGate, Int]]()
-    .withDefaultValue(Map[BasicGate, Int]())
     val inputs = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
-    .withDefaultValue(ArrayBuffer[(BasicGate, Int)]())
     val outputs = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
-    .withDefaultValue(ArrayBuffer[(IOGate, Int)]())
     var currentGates = Set[BasicGate]()
     var running = false
 
@@ -29,16 +26,18 @@ class Circuit extends Thread {
         val currentGates_ = Set[BasicGate]()
         for(gate <- currentGates) {
             val value = gate.compute
-            for((g, n) <- wires(gate)) {
-                g.changeInput(n, value)
-                // notify to the GUI
+            if(wires.contains(gate)) {
+                for((g, n) <- wires(gate)) {
+                    g.changeInput(n, value)
+                    // notify to the GUI
+                }
+                currentGates_ ++= wires(gate).keys
             }
             try {
                 outputs(gate).foreach {case (g, n) => g.changeInput(n, value)}
             } catch {
                 case _: NoSuchElementException =>
             }
-            currentGates_ ++= wires(gate).keys
         }
         currentGates = currentGates_
     }
@@ -46,7 +45,10 @@ class Circuit extends Thread {
         for(index <- values.indices) {
             try {
                 inputs((gate, index)).foreach {
-                    case (g, n) => g.changeInput(n, values(index))
+                    case (g, n) => {
+                        g.changeInput(n, values(index))
+                        currentGates += g
+                    }
                 }
             } catch {
                 case _: NoSuchElementException =>
@@ -61,8 +63,14 @@ class Circuit extends Thread {
     ) {
         val iWire = (iGate, iNumber)
         val oWire = (oGate, oNumber)
-        if(inputs.contains(iWire) && inputs(iWire).contains(oWire)) {
-            throw new WireExistsException()
+        if(inputs.contains(iWire)) {
+            if(inputs(iWire).contains(oWire)) {
+                throw new WireExistsException()
+            } else {
+                inputs(iWire) = ArrayBuffer[(BasicGate, Int)]()
+            }
+        } else {
+            inputs(iWire) = ArrayBuffer[(BasicGate, Int)]()
         }
         connect[iGate.ValueChanged] {
             case iGate.ValueChanged(i) => stepInputs(iGate, i)
@@ -84,7 +92,15 @@ class Circuit extends Thread {
         val wire = (oGate, oNumber)
         if(outputs.contains(iGate) && outputs(iGate).contains(wire)) {
             throw new WireExistsException()
+        } else {
+            outputs(iGate) = ArrayBuffer[(IOGate, Int)]()
         }
         outputs(iGate) += wire
+    }
+    def removeAll() {
+        wires.clear()
+        inputs.clear()
+        outputs.clear()
+        currentGates.clear()
     }
 }
