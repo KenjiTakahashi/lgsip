@@ -3,24 +3,27 @@ package lgsis.engine
 import gates.{BasicGate, IOGate}
 import exceptions._
 import scala.collection.mutable.{Set, Map, ArrayBuffer}
-import java.lang.Thread
 import com.scaladudes.signal.connect
+import scala.actors._
 
-class Circuit extends Thread {
+class Circuit extends Actor {
     val wires = Map[BasicGate, Map[BasicGate, Int]]()
     val inputs = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
     val outputs = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
     var currentGates = Set[BasicGate]()
-    var running = false
 
-    override def run() {
-        running = true
-        while(running) {
-            step()
+    case class STOP()
+
+    def act {
+        loop {
+            reactWithin(1) {
+                case TIMEOUT => step()
+                case STOP => exit()
+            }
         }
     }
     def die() {
-        running = false
+        this ! STOP
     }
     def step() {
         val currentGates_ = Set[BasicGate]()

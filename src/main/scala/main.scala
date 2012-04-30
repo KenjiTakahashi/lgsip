@@ -17,9 +17,9 @@ object Main extends App {
     c.addWire(b, 0, or, 1)
     c.addWire(or, o, 0)
     c.start()
-    Thread.sleep(100000)
+    Thread.sleep(10000)
     c.die()
-    b ! STOP
+    b.die()
     //c.step()
     //println(o.compute)
     //a.switch()

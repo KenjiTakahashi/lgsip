@@ -3,7 +3,6 @@ package gates
 package io
 
 import scala.actors._
-import scala.actors.Actor._
 
 class BinaryInput(input : Boolean) extends IOGate {
     inputs += input
@@ -21,12 +20,11 @@ class BinaryOutput extends IOGate {
     override def compute : Boolean = inputs(0)
 }
 
-case class STOP()
-
-class Clock extends IOGate with Actor {
+class Clock(var timeout : Long = 1000L) extends IOGate with Actor {
     inputs += false
-    var timeout = 1000L
     start()
+
+    case class STOP()
 
     def act {
         loop {
@@ -45,7 +43,10 @@ class Clock extends IOGate with Actor {
     }
     def faster() {
         timeout -= 20
-        if(timeout < 0) timeout = 0
+        if(timeout < 1) timeout = 1
+    }
+    def die() {
+        this ! STOP
     }
 
     override def compute : Boolean = inputs(0)
