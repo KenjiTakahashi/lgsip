@@ -35,5 +35,5 @@ abstract class BasicGate(number : Int, name : String) extends Gate {
 }
 
 abstract class IOGate extends Gate with SignalEmitter {
-    case class ValueChanged(value:ArrayBuffer[Boolean]) extends Signal
+    case class ValueChanged(value : ArrayBuffer[Boolean]) extends Signal
 }

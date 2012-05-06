@@ -59,10 +59,7 @@ class Circuit extends Actor {
         }
     }
     def addWire(
-        iGate : IOGate,
-        iNumber : Int,
-        oGate : BasicGate,
-        oNumber : Int
+        iGate : IOGate, iNumber : Int, oGate : BasicGate, oNumber : Int
     ) {
         val iWire = (iGate, iNumber)
         val oWire = (oGate, oNumber)
@@ -99,6 +96,22 @@ class Circuit extends Actor {
             outputs(iGate) = ArrayBuffer[(IOGate, Int)]()
         }
         outputs(iGate) += wire
+    }
+    def addWire(iGate :IOGate, oCircuit : Circuit, oNumber : Int) {
+    }
+    def addWire(iGate : BasicGate, oCircuit : Circuit, oNumber : Int) {
+    }
+    def addWire(
+        iCircuit : Circuit, iNumber : Int, oCIrcuit : Circuit, oNumber : Int
+    ) {
+    }
+    def addWire(
+        iCircuit : Circuit, iNumber : Int, oGate : BasicGate, oNumber : Int
+    ) {
+    }
+    def addWire(
+        iCircuit : Circuit, iNumber : Int, oGate : IOGate, oNumber : Int
+    ) {
     }
     def removeAll() {
         wires.clear()
