@@ -1,18 +1,22 @@
 package lgsis.engine
 
 import gates.{BasicGate, IOGate}
+import gates.io.{BinaryInput, BinaryOutput}
 import exceptions._
 import scala.collection.mutable.{Set, Map, ArrayBuffer}
 import com.scaladudes.signal.connect
 import scala.actors._
 
 class Circuit extends Actor {
-    val wires = Map[BasicGate, Map[BasicGate, Int]]()
-    val inputs = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
-    val outputs = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
-    var currentGates = Set[BasicGate]()
+    private val wires = Map[BasicGate, Map[BasicGate, Int]]()
+    private val iWires = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
+    private val oWires = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
+    private var currentGates = Set[BasicGate]()
+    private val inputs = ArrayBuffer[(BasicGate, Int)]()
+    private val outputs = ArrayBuffer[BasicGate]()
+    private var integrated = false
 
-    case class STOP()
+    private case class STOP()
 
     def act {
         loop {
@@ -37,17 +41,17 @@ class Circuit extends Actor {
                 currentGates_ ++= wires(gate).keys
             }
             try {
-                outputs(gate).foreach {case (g, n) => g.changeInput(n, value)}
+                oWires(gate).foreach {case (g, n) => g.changeInput(n, value)}
             } catch {
                 case _: NoSuchElementException =>
             }
         }
         currentGates = currentGates_
     }
-    def stepInputs(gate : IOGate, values : ArrayBuffer[Boolean]) {
+    private def stepInputs(gate : IOGate, values : ArrayBuffer[Boolean]) {
         for(index <- values.indices) {
             try {
-                inputs((gate, index)).foreach {
+                iWires((gate, index)).foreach {
                     case (g, n) => {
                         g.changeInput(n, values(index))
                         currentGates += g
@@ -58,24 +62,46 @@ class Circuit extends Actor {
             }
         }
     }
+    def integrate() {
+        integrated = true
+        for(((g, n), a) <- iWires) {
+            if(g.isInstanceOf[BinaryInput]) {
+                inputs ++= a
+                iWires -= ((g, n))
+            }
+        }
+        for((g, a) <- oWires) {
+            for(o <- a) {
+                if(o.isInstanceOf[BinaryOutput]) {
+                    outputs += g
+                    oWires(g) -= o
+                }
+            }
+        }
+    }
+    def disintegrate() {
+        integrated = false
+        inputs.clear()
+        outputs.clear()
+    }
     def addWire(
         iGate : IOGate, iNumber : Int, oGate : BasicGate, oNumber : Int
     ) {
         val iWire = (iGate, iNumber)
         val oWire = (oGate, oNumber)
-        if(inputs.contains(iWire)) {
-            if(inputs(iWire).contains(oWire)) {
+        if(iWires.contains(iWire)) {
+            if(iWires(iWire).contains(oWire)) {
                 throw new WireExistsException()
             } else {
-                inputs(iWire) = ArrayBuffer[(BasicGate, Int)]()
+                iWires(iWire) = ArrayBuffer[(BasicGate, Int)]()
             }
         } else {
-            inputs(iWire) = ArrayBuffer[(BasicGate, Int)]()
+            iWires(iWire) = ArrayBuffer[(BasicGate, Int)]()
         }
         connect[iGate.ValueChanged] {
             case iGate.ValueChanged(i) => stepInputs(iGate, i)
         }
-        inputs(iWire) += oWire
+        iWires(iWire) += oWire
         currentGates += oGate
     }
     def addWire(iGate : BasicGate, oGate : BasicGate, oNumber : Int) {
@@ -90,12 +116,12 @@ class Circuit extends Actor {
     }
     def addWire(iGate : BasicGate, oGate : IOGate, oNumber : Int) {
         val wire = (oGate, oNumber)
-        if(outputs.contains(iGate) && outputs(iGate).contains(wire)) {
+        if(oWires.contains(iGate) && oWires(iGate).contains(wire)) {
             throw new WireExistsException()
         } else {
-            outputs(iGate) = ArrayBuffer[(IOGate, Int)]()
+            oWires(iGate) = ArrayBuffer[(IOGate, Int)]()
         }
-        outputs(iGate) += wire
+        oWires(iGate) += wire
     }
     def addWire(iGate :IOGate, oCircuit : Circuit, oNumber : Int) {
     }
@@ -115,8 +141,8 @@ class Circuit extends Actor {
     }
     def removeAll() {
         wires.clear()
-        inputs.clear()
-        outputs.clear()
+        iWires.clear()
+        oWires.clear()
         currentGates.clear()
     }
 }
