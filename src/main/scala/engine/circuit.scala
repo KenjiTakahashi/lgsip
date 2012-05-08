@@ -12,7 +12,7 @@ class Circuit extends Actor {
     private val iWires = Map[(IOGate, Int), ArrayBuffer[(BasicGate, Int)]]()
     private val oWires = Map[BasicGate, ArrayBuffer[(IOGate, Int)]]()
     private var currentGates = Set[BasicGate]()
-    private val inputs = ArrayBuffer[(BasicGate, Int)]()
+    private val inputs = ArrayBuffer[ArrayBuffer[(BasicGate, Int)]]()
     private val outputs = ArrayBuffer[BasicGate]()
     private var integrated = false
 
@@ -66,7 +66,7 @@ class Circuit extends Actor {
         integrated = true
         for(((g, n), a) <- iWires) {
             if(g.isInstanceOf[BinaryInput]) {
-                inputs ++= a
+                inputs += a
                 iWires -= ((g, n))
             }
         }
@@ -123,21 +123,34 @@ class Circuit extends Actor {
         }
         oWires(iGate) += wire
     }
-    def addWire(iGate :IOGate, oCircuit : Circuit, oNumber : Int) {
+    def addWire(
+        iGate :IOGate, iNumber : Int, oCircuit : Circuit, oNumber : Int
+    ) {
+        for((g, n) <- oCircuit.inputs(oNumber)) {
+            addWire(iGate, iNumber, g, n)
+        }
     }
     def addWire(iGate : BasicGate, oCircuit : Circuit, oNumber : Int) {
+        for((g, n) <- oCircuit.inputs(oNumber)) {
+            addWire(iGate, g, n)
+        }
     }
     def addWire(
-        iCircuit : Circuit, iNumber : Int, oCIrcuit : Circuit, oNumber : Int
+        iCircuit : Circuit, iNumber : Int, oCircuit : Circuit, oNumber : Int
     ) {
+        for((g, n) <- oCircuit.inputs(oNumber)) {
+            addWire(iCircuit.outputs(iNumber), g, n)
+        }
     }
     def addWire(
         iCircuit : Circuit, iNumber : Int, oGate : BasicGate, oNumber : Int
     ) {
+        addWire(iCircuit.outputs(iNumber), oGate, oNumber)
     }
     def addWire(
         iCircuit : Circuit, iNumber : Int, oGate : IOGate, oNumber : Int
     ) {
+        addWire(iCircuit.outputs(iNumber), oGate, oNumber)
     }
     def removeAll() {
         wires.clear()

@@ -24,7 +24,7 @@ class Clock(var timeout : Long = 1000L) extends IOGate with Actor {
     inputs += false
     start()
 
-    case class STOP()
+    private case class STOP()
 
     def act {
         loop {
