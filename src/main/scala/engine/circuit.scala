@@ -103,6 +103,7 @@ class Circuit extends Actor {
         }
         iWires(iWire) += oWire
         currentGates += oGate
+        stepInputs(iGate, iGate.inputs)
     }
     def addWire(iGate : BasicGate, oGate : BasicGate, oNumber : Int) {
         if(wires.contains(iGate)) {
