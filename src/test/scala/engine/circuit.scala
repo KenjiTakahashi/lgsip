@@ -4,7 +4,9 @@ import lgsis.engine.gates.io._
 import lgsis.engine.Circuit
 
 class CircuitTest extends mutable.Specification {
-    def ASimpleCircuit : (Circuit, BinaryOutput) = {
+    def ASimpleCircuit(
+        v1 : Boolean, v2 : Boolean, v3 : Boolean
+    ) : (Circuit, BinaryOutput) = {
         val circuit = new Circuit()
         val i1 = new BinaryInput(true)
         val i2 = new BinaryInput(true)
@@ -27,9 +29,50 @@ class CircuitTest extends mutable.Specification {
 
     "A Simple Circuit" should {
         "return true for (true, true, true)" in {
-            val (circuit, o) = ASimpleCircuit
+            val (circuit, o) = ASimpleCircuit(true, true, true)
             circuit.step()
-            o.compute should beEqualTo(false)
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return true for (true, true, false)" in {
+            val (circuit, o) = ASimpleCircuit(true, true, false)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return true for (true, false, true)" in {
+            val (circuit, o) = ASimpleCircuit(true, false, true)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return false for (true, false, false)" in {
+            val (circuit, o) = ASimpleCircuit(true, false, false)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return false for (false, true, true)" in {
+            val (circuit, o) = ASimpleCircuit(false, true, true)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return false for (false, true, false)" in {
+            val (circuit, o) = ASimpleCircuit(false, true, false)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return true for (false, false, true)" in {
+            val (circuit, o) = ASimpleCircuit(false, false, true)
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(true)
+        }
+        "return false for (false, false, false)" in {
+            val (circuit, o) = ASimpleCircuit(false, false, false)
+            circuit.step()
             circuit.step()
             o.compute should beEqualTo(true)
         }
