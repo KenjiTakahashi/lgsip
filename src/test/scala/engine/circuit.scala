@@ -8,17 +8,17 @@ class CircuitTest extends mutable.Specification {
         v1 : Boolean, v2 : Boolean, v3 : Boolean
     ) : (Circuit, BinaryOutput) = {
         val circuit = new Circuit()
-        val i1 = new BinaryInput(true)
-        val i2 = new BinaryInput(true)
-        val i3 = new BinaryInput(true)
+        val i1 = new BinaryInput(v1)
+        val i2 = new BinaryInput(v2)
+        val i3 = new BinaryInput(v3)
         val o = new BinaryOutput()
         val not = new Not()
         val and1 = new And(2)
         val and2 = new And(2)
         val or = new Or(2)
-        circuit.addWire(i1, 0, not, 0)
-        circuit.addWire(not, and1, 0)
-        circuit.addWire(i2, 0, and1, 1)
+        circuit.addWire(i1, 0, and1, 0)
+        circuit.addWire(i2, 0, not, 0)
+        circuit.addWire(not, and1, 1)
         circuit.addWire(i2, 0, and2, 0)
         circuit.addWire(i3, 0, and2, 1)
         circuit.addWire(and1, or, 0)
@@ -32,10 +32,12 @@ class CircuitTest extends mutable.Specification {
             val (circuit, o) = ASimpleCircuit(true, true, true)
             circuit.step()
             circuit.step()
+            circuit.step()
             o.compute should beEqualTo(true)
         }
-        "return true for (true, true, false)" in {
-            val (circuit, o) = ASimpleCircuit(true, true, false)
+        "return true for (false, true, true)" in {
+            val (circuit, o) = ASimpleCircuit(false, true, true)
+            circuit.step()
             circuit.step()
             circuit.step()
             o.compute should beEqualTo(true)
@@ -44,28 +46,33 @@ class CircuitTest extends mutable.Specification {
             val (circuit, o) = ASimpleCircuit(true, false, true)
             circuit.step()
             circuit.step()
-            o.compute should beEqualTo(true)
-        }
-        "return false for (true, false, false)" in {
-            val (circuit, o) = ASimpleCircuit(true, false, false)
-            circuit.step()
             circuit.step()
             o.compute should beEqualTo(true)
         }
-        "return false for (false, true, true)" in {
-            val (circuit, o) = ASimpleCircuit(false, true, true)
+        "return false for (false, false, true)" in {
+            val (circuit, o) = ASimpleCircuit(false, false, true)
             circuit.step()
             circuit.step()
-            o.compute should beEqualTo(true)
+            circuit.step()
+            o.compute should beEqualTo(false)
+        }
+        "return false for (true, true, false)" in {
+            val (circuit, o) = ASimpleCircuit(true, true, false)
+            circuit.step()
+            circuit.step()
+            circuit.step()
+            o.compute should beEqualTo(false)
         }
         "return false for (false, true, false)" in {
             val (circuit, o) = ASimpleCircuit(false, true, false)
             circuit.step()
             circuit.step()
-            o.compute should beEqualTo(true)
+            circuit.step()
+            o.compute should beEqualTo(false)
         }
-        "return true for (false, false, true)" in {
-            val (circuit, o) = ASimpleCircuit(false, false, true)
+        "return true for (true, false, false)" in {
+            val (circuit, o) = ASimpleCircuit(true, false, false)
+            circuit.step()
             circuit.step()
             circuit.step()
             o.compute should beEqualTo(true)
@@ -74,7 +81,28 @@ class CircuitTest extends mutable.Specification {
             val (circuit, o) = ASimpleCircuit(false, false, false)
             circuit.step()
             circuit.step()
-            o.compute should beEqualTo(true)
+            circuit.step()
+            o.compute should beEqualTo(false)
+        }
+        "properly intergrate, thus giving possibility to connect another wires and give proper results" in {
+            val (circuit, o) = ASimpleCircuit(true, true, true)
+            circuit.step()
+            circuit.step()
+            circuit.integrate()
+            val circuit_ = new Circuit()
+            val i1 = new BinaryInput(true)
+            val i2 = new BinaryInput(false)
+            val i3 = new BinaryInput(false)
+            val o_ = new BinaryOutput()
+            circuit_.addWire(i1, 0, circuit, 0)
+            circuit_.addWire(i2, 0, circuit, 1)
+            circuit_.addWire(i3, 0, circuit, 2)
+            circuit_.addWire(circuit, 0, o_, 0)
+            circuit_.step()
+            circuit_.step()
+            circuit_.step()
+            circuit_.step()
+            o_.compute should beEqualTo(true)
         }
     }
 
@@ -122,6 +150,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(false)
         }
@@ -129,6 +158,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 false, true, true, true
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(false)
@@ -140,6 +170,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(false)
         }
@@ -147,6 +178,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 false, false, true, true
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(true)
@@ -158,6 +190,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(true)
         }
@@ -167,6 +200,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(true)
         }
@@ -174,6 +208,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 true, false, false, true
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(false)
@@ -185,6 +220,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(true)
             o2.compute should beEqualTo(true)
         }
@@ -192,6 +228,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 true, false, false, false
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(false)
@@ -203,6 +240,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(true)
         }
@@ -210,6 +248,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 true, false, true, false
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(false)
@@ -221,6 +260,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(true)
             o2.compute should beEqualTo(false)
         }
@@ -228,6 +268,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 false, false, true, true
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(true)
@@ -239,6 +280,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(true)
         }
@@ -248,6 +290,7 @@ class CircuitTest extends mutable.Specification {
             )
             circuit.step()
             circuit.step()
+            circuit.step()
             o1.compute should beEqualTo(false)
             o2.compute should beEqualTo(false)
         }
@@ -255,6 +298,7 @@ class CircuitTest extends mutable.Specification {
             val (circuit, (o1, o2)) = ASophisticatedCircuit(
                 false, false, false, false
             )
+            circuit.step()
             circuit.step()
             circuit.step()
             o1.compute should beEqualTo(false)

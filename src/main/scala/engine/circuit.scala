@@ -72,7 +72,7 @@ class Circuit extends Actor {
         }
         for((g, a) <- oWires) {
             for(o <- a) {
-                if(o.isInstanceOf[BinaryOutput]) {
+                if(o._1.isInstanceOf[BinaryOutput]) {
                     outputs += g
                     oWires(g) -= o
                 }
