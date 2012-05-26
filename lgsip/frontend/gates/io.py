@@ -16,28 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from lgsip.frontend.center import LgsipTabWidget
-from lgsip.frontend.left import LgsipBasicGatesBox
 
 
-class Main(QtGui.QMainWindow):
-    def __init__(self):
-        super(Main, self).__init__()
-        widget = QtGui.QWidget()
-        layout = QtGui.QHBoxLayout()
-        self.basicgates = LgsipBasicGatesBox()
-        self.tabs = LgsipTabWidget()
-        self.tabs.addTab()
-        layout.addWidget(self.basicgates)
-        layout.addWidget(self.tabs)
-        widget.setLayout(layout)
-        self.setCentralWidget(widget)
+class BinaryInput(QtGui.QWidget):
+    pass
 
 
-def run():
-    import sys
-    app = QtGui.QApplication(sys.argv)
-    app.setApplicationName("lgsip")
-    main = Main()
-    main.show()
-    sys.exit(app.exec_())
+class BinaryOutput(QtGui.QWidget):
+    pass
