@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt, QSize, QPointF
+from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData
 
 
 class _LgsipGateButton(QtGui.QPushButton):
@@ -88,6 +88,7 @@ class Gate(QtGui.QWidget):
         delta = self.h / (outputs + 1)
         for i in range(1, outputs + 1):
             self.path.addRect(50, delta * i - 2, 10, 4)
+        self.setFixedWidth(60)
 
     def paintEvent(self, event):
         super(Gate, self).paintEvent(event)
@@ -96,6 +97,19 @@ class Gate(QtGui.QWidget):
         painter.setPen(Qt.NoPen)
         painter.setBrush(QtGui.QPalette().mid())
         painter.drawPath(self.path)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            drag = QtGui.QDrag(self)
+            data = QMimeData()
+            data.setData('lgsip/x-classname', type(self).__name__)
+            data.setData('lgsip/x-modulename', type(self).__module__)
+            drag.setMimeData(data)
+            pixmap = QtGui.QPixmap(self.size())
+            pixmap.fill(Qt.transparent)
+            self.render(pixmap, flags=QtGui.QWidget.DrawChildren)
+            drag.setPixmap(pixmap)
+            drag.exec_()
 
     def sizeHint(self):
         return QSize(60, self.h)

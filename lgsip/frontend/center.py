@@ -17,6 +17,7 @@
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, QPointF, QSize, pyqtSignal
+from lgsip.frontend.sketchboard import SketchBoard
 
 
 class _LgsipPushButton(QtGui.QPushButton):
@@ -117,7 +118,7 @@ class LgsipTabWidget(QtGui.QTabWidget):
         else:
             name = "Circuit " + str(self._number)
             self._number += 1
-        widget = QtGui.QWidget()  # we'll use our custom widget here, later
+        widget = SketchBoard()
         index = super(LgsipTabWidget, self).addTab(widget, name)
         buttons = _LgsipTabBarButtons(widget)
         buttons.closeClicked.connect(self.removeTab)
