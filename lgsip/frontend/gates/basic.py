@@ -15,10 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lgsip.frontend.gates.gate import Gate
+from lgsip.frontend.gates.gate import BasicGate
 
 
-class And(Gate):
+class And(BasicGate):
     def __init__(self, inputs=2, parent=None):
         super(And, self).__init__(inputs, parent=parent)
         self.path.moveTo(30, self.h / 2)

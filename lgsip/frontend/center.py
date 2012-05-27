@@ -21,12 +21,12 @@ from PyQt4.QtCore import Qt, QPointF, QSize, pyqtSignal
 
 class _LgsipPushButton(QtGui.QPushButton):
     def __init__(self, parent=None):
-        QtGui.QPushButton.__init__(self, parent)
+        super(_LgsipPushButton, self).__init__(parent)
         self.path = QtGui.QPainterPath()
         self.path.setFillRule(Qt.WindingFill)
 
     def paintEvent(self, event):
-        QtGui.QPushButton.paintEvent(self, event)
+        super(_LgsipPushButton, self).paintEvent(event)
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
         painter.setPen(Qt.NoPen)
