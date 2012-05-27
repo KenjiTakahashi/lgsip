@@ -55,7 +55,10 @@ class DeleteGateButton(_LgsipGateButton):
     def __init__(self, parent=None):
         super(DeleteGateButton, self).__init__(parent)
         self.path.addPolygon(QtGui.QPolygonF([
-            QPointF(3, 6), QPointF(6, 3), QPointF(13, 10), QPointF(10, 13)
+            QPointF(3, 5), QPointF(5, 3), QPointF(13, 11), QPointF(11, 13)
+        ]))
+        self.path.addPolygon(QtGui.QPolygonF([
+            QPointF(3, 11), QPointF(5, 13), QPointF(13, 5), QPointF(11, 3)
         ]))
         self.color = QtGui.QColor(0, 0, 160)
 
