@@ -32,9 +32,10 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def dropEvent(self, event):
         data = event.mimeData()
         module = bytes(data.data('lgsip/x-modulename').data()).decode('utf-8')
-        class_ = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
-        gate = __import__(module, globals(), locals(), class_)
-        proxy = self.addWidget(getattr(gate, class_)())
+        cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
+        gate = getattr(__import__(module, globals(), locals(), cls), cls)()
+        gate.setStyleSheet('background-color: transparent;')
+        proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
 
 
