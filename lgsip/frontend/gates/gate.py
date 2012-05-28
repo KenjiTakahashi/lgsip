@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData
+from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData, QPoint
 
 
 class _LgsipGateButton(QtGui.QPushButton):
@@ -80,6 +80,8 @@ class DesintegrateGateButton(_LgsipGateButton):
 class Gate(QtGui.QWidget):
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
+        self._sketched = False
+        self.offset = QPoint()
         self.path = QtGui.QPainterPath()
         self.h = 24 + 24 * (inputs - 1)
         delta = self.h / (inputs + 1)
@@ -90,6 +92,9 @@ class Gate(QtGui.QWidget):
             self.path.addRect(50, delta * i - 2, 10, 4)
         self.setFixedWidth(60)
 
+    def setSketched(self, val):
+        self._sketched = val
+
     def paintEvent(self, event):
         super(Gate, self).paintEvent(event)
         painter = QtGui.QPainter(self)
@@ -99,7 +104,9 @@ class Gate(QtGui.QWidget):
         painter.drawPath(self.path)
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if self._sketched:
+            self.offset = event.pos()
+        else:
             drag = QtGui.QDrag(self)
             data = QMimeData()
             data.setData('lgsip/x-classname', type(self).__name__)
@@ -111,6 +118,13 @@ class Gate(QtGui.QWidget):
             drag.setPixmap(pixmap)
             drag.exec_()
 
+    def mouseMoveEvent(self, event):
+        if self._sketched:
+            self.move(self.mapToParent(event.pos() - self.offset))
+
+    def mouseReleaseEvent(self, event):
+        self.offset = QPoint()
+
     def sizeHint(self):
         return QSize(60, self.h)
 
@@ -121,7 +135,7 @@ class BasicGate(Gate):
         self.removeWire = RemoveWireButton(self)
         self.removeWire.move(10, -2)
         delta = self.h / 2
-        self.delete = DeleteGateButton(self)
+        self.delete = DeleteGateButton(self)  # move it to Gate
         self.delete.move(10, delta - 16)
         self.desintegrate = DesintegrateGateButton(self)
         self.desintegrate.move(10, delta - 4)

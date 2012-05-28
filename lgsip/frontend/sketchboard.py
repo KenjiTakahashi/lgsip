@@ -23,17 +23,12 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
         super(_LgsipScene, self).__init__(parent)
 
-    def dragEnterEvent(self, event):
-        data = event.mimeData()
-        if(data.hasFormat('lgsip/x-classname')
-        and data.hasFormat('lgsip/x-modulename')):
-            event.acceptProposedAction()
-
     def dropEvent(self, event):
         data = event.mimeData()
         module = bytes(data.data('lgsip/x-modulename').data()).decode('utf-8')
         cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
         gate = getattr(__import__(module, globals(), locals(), cls), cls)()
+        gate.setSketched(True)
         gate.setStyleSheet('background-color: transparent;')
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
