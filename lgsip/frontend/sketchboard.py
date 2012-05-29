@@ -17,11 +17,13 @@
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt
+from lgsip.frontend.gates.wire import Wire
 
 
 class _LgsipScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
         super(_LgsipScene, self).__init__(parent)
+        self.newLine = None
 
     def dropEvent(self, event):
         data = event.mimeData()
@@ -33,12 +35,30 @@ class _LgsipScene(QtGui.QGraphicsScene):
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
 
+    def mousePressEvent(self, event):
+        pos = event.scenePos()
+        self.newLine = Wire(pos.x(), pos.y())
+        self.addItem(self.newLine)
+
+    def mouseMoveEvent(self, event):
+        if self.newLine:
+            pos = event.scenePos()
+            self.newLine.setLine(pos.x(), pos.y())
+            self.update()
+
+    def mouseReleaseEvent(self, event):
+        self.newLine = None
+
 
 class SketchBoard(QtGui.QGraphicsView):
     def __init__(self, parent=None):
         super(SketchBoard, self).__init__(parent)
         self.setAcceptDrops(True)
         self.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        # Hope it will be fast enough or maybe we'll
+        # find a better way later on.
+        self.setViewportUpdateMode(self.FullViewportUpdate)
+        self.setMouseTracking(True)
         self.setScene(_LgsipScene())
 
     def dragEnterEvent(self, event):
