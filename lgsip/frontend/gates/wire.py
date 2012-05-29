@@ -16,14 +16,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import QRectF
+from PyQt4.QtCore import QRectF, Qt
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, x=0, y=0):
+    def __init__(self, x=0, y=0, propagating=False, inGate=False):
         super(Wire, self).__init__()
         self.x, self.y = x, y
         self.nx, self.ny = x, y
+        self.propagating = propagating
+        self.inGate = inGate
 
     def setLine(self, x, y):
         self.nx, self.ny = x, y
@@ -32,4 +34,15 @@ class Wire(QtGui.QGraphicsObject):
         return QRectF(self.x, self.y, self.x + self.nx, self.y + self.ny)
 
     def paint(self, painter, option, widget):
+        pen = QtGui.QPen()
+        pen.setWidth(3)
+        pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
+        painter.setPen(pen)
         painter.drawLine(self.x, self.y, self.nx, self.ny)
+        if self.propagating:
+            dpen = QtGui.QPen()
+            dpen.setWidth(3)
+            dpen.setDashPattern([3, 4])
+            dpen.setColor(Qt.red)
+            painter.setPen(dpen)
+            painter.drawLine(self.x, self.y, self.nx, self.ny)
