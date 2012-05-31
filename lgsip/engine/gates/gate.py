@@ -16,26 +16,36 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.engine import lgsiperr
-from PyQt4.QtCore import QObject
-from pykka.actor import ThreadingActor
+from PyQt4.QtCore import QThread, pyqtSignal
 
 
-class _Gate(QObject, ThreadingActor):
+class _Gate(QThread):
     def __init__(self):
         super(_Gate, self).__init__()
         self._inputs = list()
-        self._wires = list()
+        self._gates = list()
+        self._changed = False
+        self._output = False
+        self._running = True
         self.start()
 
-    def on_receive(self, message):
-        if message.get('die'):
-            self.stop()
-        else:
-            pass
+    def run(self):
+        while self._running:
+            if self._changed:
+                _newOutput = self.compute
+                if _newOutput != self._output:
+                    self._output = _newOutput
+                    for gate in self._gates:
+                        gate.changeInput(self._output)
+
+    def die(self):
+        self._running = False
 
     def changeInput(self, index, value):
         try:
-            self._inputs[value] = value
+            if self._inputs[index] != value:
+                self._inputs[index] = value
+                self._changed = True
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
 
@@ -43,5 +53,13 @@ class _Gate(QObject, ThreadingActor):
         raise NotImplementedError
 
 
-class Compound(QObject):
-    pass
+class BasicGate(_Gate):
+    def __init__(self, number, name):
+        super(BasicGate, self).__init__()
+        if name != "Not" and number < 2:
+            raise lgsiperr.NotEnoughInputsError
+        self._inputs += [False] * number
+
+
+class IOGate(_Gate):
+    valueChanged = pyqtSignal(list)
