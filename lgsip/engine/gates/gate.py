@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from lgsip.engine import lgsiperr
 from PyQt4.QtCore import QObject
 from pykka.actor import ThreadingActor
 
@@ -31,6 +32,12 @@ class _Gate(QObject, ThreadingActor):
             self.stop()
         else:
             pass
+
+    def changeInput(self, index, value):
+        try:
+            self._inputs[value] = value
+        except IndexError:
+            raise lgsiperr.InvalidInputIndexError
 
     def compute(self):
         raise NotImplementedError
