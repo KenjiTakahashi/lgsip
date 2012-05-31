@@ -41,7 +41,7 @@ class Wire(QtGui.QGraphicsObject):
         painter.drawLine(self.x, self.y, self.nx, self.ny)
         if self.propagating:
             dpen = QtGui.QPen()
-            dpen.setWidth(3)
+            dpen.setWidth(4)
             dpen.setDashPattern([3, 4])
             dpen.setColor(Qt.red)
             painter.setPen(dpen)

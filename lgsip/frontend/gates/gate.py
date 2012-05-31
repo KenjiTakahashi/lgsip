@@ -77,32 +77,43 @@ class DesintegrateGateButton(_LgsipGateButton):
         self.color = QtGui.QColor(0, 0, 160)
 
 
+class WireButton(_LgsipGateButton):
+    def __init__(self, parent=None):
+        super(WireButton, self).__init__(parent)
+        self.setFixedSize(QSize(10, 4))
+        self.path.addRect(0, 0, 10, 4)
+        self.color = QtGui.QPalette().mid()
+
+
 class Gate(QtGui.QWidget):
-    wiring = pyqtSignal()
+    wiring = pyqtSignal(int, int, int)
 
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
         self._sketched = False
+        self.setStyleSheet('background-color: transparent;')
         self.offset = QPoint()
         self.path = QtGui.QPainterPath()
         self.h = 24 + 24 * (inputs - 1)
         delta = self.h / (inputs + 1)
         for i in range(1, inputs + 1):
-            location = delta * i - 2
-            self.path.addRect(0, location, 10, 4)
-            button = QtGui.QPushButton(self)  # roll our own here
-            button.setFixedSize(16, 16)
-            button.move(0, location - 6)
-            button.clicked.connect(self.wiring)
+            button = WireButton(self)
+            button.move(0, delta * i - 2)
+            button.clicked.connect(self._wiringIn)
         delta = self.h / (outputs + 1)
         for i in range(1, outputs + 1):
-            location = delta * i - 2
-            self.path.addRect(50, location, 10, 4)
-            button = QtGui.QPushButton(self)  # roll our own here, too
-            button.setFixedSize(16, 16)
-            button.move(50, location - 6)
-            button.clicked.connect(self.wiring)
+            button = WireButton(self)
+            button.move(50, delta * i - 2)
+            button.clicked.connect(self._wiringOut)
         self.setFixedWidth(60)
+
+    def _wiringIn(self):
+        pos = self.sender().pos()
+        self.wiring.emit(0, pos.y() + 2, 0)
+
+    def _wiringOut(self):
+        pos = self.sender().pos()
+        self.wiring.emit(60, pos.y() + 2, 1)
 
     def setSketched(self, val):
         self._sketched = val

@@ -24,7 +24,7 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
         super(_LgsipScene, self).__init__(parent)
         self._wire = None
-        #self.newLine = None
+        self._direction = None
 
     def dropEvent(self, event):
         data = event.mimeData()
@@ -32,36 +32,32 @@ class _LgsipScene(QtGui.QGraphicsScene):
         cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
         gate = getattr(__import__(module, globals(), locals(), cls), cls)()
         gate.setSketched(True)
-        gate.setStyleSheet('background-color: transparent;')
         gate.wiring.connect(self.wire)
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
 
-    def wire(self):
-        if self._wire:
-            # end wire
+    def wire(self, x, y, direction):
+        if self._wire and self._direction != direction:
+            pos = self.sender().pos()
+            self._wire.setLine(pos.x() + x, pos.y() + y)
             self._wire = None
-        else:
-            pos = self.scenePos()
-            self._wire = Wire(pos.x(), pos.y())
+        elif not self._wire:
+            self._direction = direction
+            pos = self.sender().pos()
+            self._wire = Wire(pos.x() + x, pos.y() + y)
             self.addItem(self._wire)
 
     #def mousePressEvent(self, event):
-        #pos = event.scenePos()
-        #self.newLine = Wire(pos.x(), pos.y())
-        #self.addItem(self.newLine)
+        #super(_LgsipScene, self).mousePressEvent(event)
+        #if self._wire:
+            #self.removeItem(self._wire)
+            #self._wire = None
 
     def mouseMoveEvent(self, event):
         if self._wire:
             pos = event.scenePos()
             self._wire.setLine(pos.x(), pos.y())
-        #if self.newLine:
-            #pos = event.scenePos()
-            #self.newLine.setLine(pos.x(), pos.y())
             self.update()
-
-    #def mouseReleaseEvent(self, event):
-        #self.newLine = None
 
 
 class SketchBoard(QtGui.QGraphicsView):
