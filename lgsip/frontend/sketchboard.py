@@ -23,7 +23,8 @@ from lgsip.frontend.gates.wire import Wire
 class _LgsipScene(QtGui.QGraphicsScene):
     def __init__(self, parent=None):
         super(_LgsipScene, self).__init__(parent)
-        self.newLine = None
+        self._wire = None
+        #self.newLine = None
 
     def dropEvent(self, event):
         data = event.mimeData()
@@ -32,22 +33,35 @@ class _LgsipScene(QtGui.QGraphicsScene):
         gate = getattr(__import__(module, globals(), locals(), cls), cls)()
         gate.setSketched(True)
         gate.setStyleSheet('background-color: transparent;')
+        gate.wiring.connect(self.wire)
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
 
-    def mousePressEvent(self, event):
-        pos = event.scenePos()
-        self.newLine = Wire(pos.x(), pos.y())
-        self.addItem(self.newLine)
+    def wire(self):
+        if self._wire:
+            # end wire
+            self._wire = None
+        else:
+            pos = self.scenePos()
+            self._wire = Wire(pos.x(), pos.y())
+            self.addItem(self._wire)
+
+    #def mousePressEvent(self, event):
+        #pos = event.scenePos()
+        #self.newLine = Wire(pos.x(), pos.y())
+        #self.addItem(self.newLine)
 
     def mouseMoveEvent(self, event):
-        if self.newLine:
+        if self._wire:
             pos = event.scenePos()
-            self.newLine.setLine(pos.x(), pos.y())
+            self._wire.setLine(pos.x(), pos.y())
+        #if self.newLine:
+            #pos = event.scenePos()
+            #self.newLine.setLine(pos.x(), pos.y())
             self.update()
 
-    def mouseReleaseEvent(self, event):
-        self.newLine = None
+    #def mouseReleaseEvent(self, event):
+        #self.newLine = None
 
 
 class SketchBoard(QtGui.QGraphicsView):
