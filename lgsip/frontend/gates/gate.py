@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData, QPoint
+from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData, QPoint, pyqtSignal
 
 
 class _LgsipGateButton(QtGui.QPushButton):
@@ -78,6 +78,8 @@ class DesintegrateGateButton(_LgsipGateButton):
 
 
 class Gate(QtGui.QWidget):
+    wiring = pyqtSignal()
+
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
         self._sketched = False
@@ -86,10 +88,20 @@ class Gate(QtGui.QWidget):
         self.h = 24 + 24 * (inputs - 1)
         delta = self.h / (inputs + 1)
         for i in range(1, inputs + 1):
-            self.path.addRect(0, delta * i - 2, 10, 4)
+            location = delta * i - 2
+            self.path.addRect(0, location, 10, 4)
+            button = QtGui.QPushButton(self)  # roll our own here
+            button.setFixedSize(16, 16)
+            button.move(0, location - 6)
+            button.clicked.connect(self.wiring)
         delta = self.h / (outputs + 1)
         for i in range(1, outputs + 1):
-            self.path.addRect(50, delta * i - 2, 10, 4)
+            location = delta * i - 2
+            self.path.addRect(50, location, 10, 4)
+            button = QtGui.QPushButton(self)  # roll our own here, too
+            button.setFixedSize(16, 16)
+            button.move(50, location - 6)
+            button.clicked.connect(self.wiring)
         self.setFixedWidth(60)
 
     def setSketched(self, val):
