@@ -15,26 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from PyQt4.QtCore import QObject
-from pykka.actor import ThreadingActor
+
+class Error(Exception):
+    def __str__(self):
+        return repr(self.message)
 
 
-class _Gate(QObject, ThreadingActor):
+class NotEnoughInputsError(Error):
     def __init__(self):
-        super(_Gate, self).__init__()
-        self._inputs = list()
-        self._wires = list()
-        self.start()
-
-    def on_receive(self, message):
-        if message.get('die'):
-            self.stop()
-        else:
-            pass
-
-    def compute(self):
-        raise NotImplementedError
+        self.message = "There need to be at least 2 inputs for a gate."
 
 
-class Compound(QObject):
-    pass
+class NagativeNumOfInputsError(Error):
+    def __init__(self):
+        self.message = "Number of inputs to add/remove should be positive."
+
+
+class InvalidInputIndexError(Error):
+    def __init__(self):
+        self.message = "The specified input does not exist."
+
+
+class WireExistsError(Error):
+    def __init__(self):
+        self.message = "The specified wire already exists."
+
+
+class IOConnectedError(Error):
+    def __init__(self):
+        self.message = "The specified input/output is already connected."
