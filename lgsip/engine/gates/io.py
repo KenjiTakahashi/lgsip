@@ -21,6 +21,7 @@ from PyQt4.QtCore import QTimer
 
 class BinaryInput(IOGate):
     def __init__(self, value):
+        super(BinaryInput, self).__init__()
         self._inputs.append(value)
 
     def switch(self):
@@ -33,6 +34,7 @@ class BinaryInput(IOGate):
 
 class BinaryOutput(IOGate):
     def __init__(self):
+        super(BinaryOutput, self).__init__()
         self._inputs.append(False)
 
     def compute(self):

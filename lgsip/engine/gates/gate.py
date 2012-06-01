@@ -25,28 +25,36 @@ class _Gate(QThread):
         self._inputs = list()
         self._gates = list()
         self._changed = False
-        self._output = False
+        #self._output = False
         self._running = True
         self.start()
 
     def run(self):
         while self._running:
-            if self._changed:
-                _newOutput = self.compute
-                if _newOutput != self._output:
-                    self._output = _newOutput
-                    for gate in self._gates:
-                        gate.changeInput(self._output)
+            self.msleep(1)
+            #if self._changed:
+            for (gate, index) in self._gates:
+                gate.changeInput(index, self.compute())
+                #_newOutput = self.compute()
+                #if _newOutput != self._output:
+                    #self._output = _newOutput
+                    #for (gate, index) in self._gates:
+                        #gate.changeInput(index, self._output)
 
     def die(self):
         self._running = False
 
+    def addWire(self, gate):
+        self._gates.append(gate)
+
     def changeInput(self, index, value):
         try:
+            #self._inputs[index] = value
             if self._inputs[index] != value:
                 self._inputs[index] = value
                 self._changed = True
         except IndexError:
+            print(1)
             raise lgsiperr.InvalidInputIndexError
 
     def compute(self):
