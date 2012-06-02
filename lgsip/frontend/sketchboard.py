@@ -25,6 +25,7 @@ class _LgsipScene(QtGui.QGraphicsScene):
         super(_LgsipScene, self).__init__(parent)
         self._wire = None
         self._direction = None
+        self._sender = None
 
     def dropEvent(self, event):
         data = event.mimeData()
@@ -40,17 +41,23 @@ class _LgsipScene(QtGui.QGraphicsScene):
         if self._wire and self._direction != direction:
             pos = self.sender().pos()
             self._wire.setLine(pos.x() + x, pos.y() + y)
+            self.sender().appendWire(self._wire, 1, (x, y))
             self._wire = None
+            self._sender = None
         elif not self._wire:
             self._direction = direction
-            pos = self.sender().pos()
+            self._sender = self.sender()
+            pos = self._sender.pos()
             self._wire = Wire(pos.x() + x, pos.y() + y)
+            self._sender.appendWire(self._wire, 0, (x, y))
             self.addItem(self._wire)
 
     def mousePressEvent(self, event):
         if self._wire and event.button() == Qt.RightButton:
             self.removeItem(self._wire)
+            self._sender.parent().removeWire(self._wire, 0)
             self._wire = None
+            self._sender = None
         super(_LgsipScene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):

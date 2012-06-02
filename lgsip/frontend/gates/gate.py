@@ -91,6 +91,7 @@ class Gate(QtGui.QWidget):
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
         self._sketched = False
+        self._wires = list()
         self.setStyleSheet('background-color: transparent;')
         self.offset = QPoint()
         self.path = QtGui.QPainterPath()
@@ -118,6 +119,14 @@ class Gate(QtGui.QWidget):
     def setSketched(self, val):
         self._sketched = val
 
+    def appendWire(self, wire, inOut, pos):
+        self._wires.append((wire, inOut, pos))
+
+    def removeWire(self, wire, inOut):
+        for wire, inOut, pos in self._wires:
+            if wire == wire and inOut == inOut:
+                self._wires.remove((wire, inOut, pos))
+
     def paintEvent(self, event):
         super(Gate, self).paintEvent(event)
         painter = QtGui.QPainter(self)
@@ -143,7 +152,13 @@ class Gate(QtGui.QWidget):
 
     def mouseMoveEvent(self, event):
         if self._sketched:
-            self.move(self.mapToParent(event.pos() - self.offset))
+            newPos = self.mapToParent(event.pos() - self.offset)
+            self.move(newPos)
+            for wire, inOut, (x, y) in self._wires:
+                if inOut:
+                    wire.setLine(x + newPos.x(), y + newPos.y())
+                else:
+                    wire.setStart(x + newPos.x(), y + newPos.y())
 
     def mouseReleaseEvent(self, event):
         self.offset = QPoint()

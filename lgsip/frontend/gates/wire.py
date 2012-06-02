@@ -30,6 +30,9 @@ class Wire(QtGui.QGraphicsObject):
     def setLine(self, x, y):
         self.nx, self.ny = x, y
 
+    def setStart(self, x, y):
+        self.x, self.y = x, y
+
     def boundingRect(self):
         return QRectF(self.x, self.y, self.x + self.nx, self.y + self.ny)
 
