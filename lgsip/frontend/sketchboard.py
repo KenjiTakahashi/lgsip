@@ -47,11 +47,12 @@ class _LgsipScene(QtGui.QGraphicsScene):
             self._wire = Wire(pos.x() + x, pos.y() + y)
             self.addItem(self._wire)
 
-    #def mousePressEvent(self, event):
-        #super(_LgsipScene, self).mousePressEvent(event)
-        #if self._wire:
-            #self.removeItem(self._wire)
-            #self._wire = None
+    def mousePressEvent(self, event):
+        if self._wire and event.button() == Qt.RightButton:
+            self.removeItem(self._wire)
+            self._wire = None
+        else:
+            super(_LgsipScene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self._wire:

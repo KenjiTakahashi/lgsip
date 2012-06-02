@@ -35,7 +35,7 @@ class Wire(QtGui.QGraphicsObject):
 
     def paint(self, painter, option, widget):
         pen = QtGui.QPen()
-        pen.setWidth(3)
+        pen.setWidth(4)
         pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
         painter.setPen(pen)
         painter.drawLine(self.x, self.y, self.nx, self.ny)
