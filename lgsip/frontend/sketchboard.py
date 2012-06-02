@@ -51,14 +51,14 @@ class _LgsipScene(QtGui.QGraphicsScene):
         if self._wire and event.button() == Qt.RightButton:
             self.removeItem(self._wire)
             self._wire = None
-        else:
-            super(_LgsipScene, self).mousePressEvent(event)
+        super(_LgsipScene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self._wire:
             pos = event.scenePos()
             self._wire.setLine(pos.x(), pos.y())
             self.update()
+        super(_LgsipScene, self).mouseMoveEvent(event)
 
 
 class SketchBoard(QtGui.QGraphicsView):
