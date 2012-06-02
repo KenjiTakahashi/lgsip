@@ -32,18 +32,18 @@ class Main(QtGui.QMainWindow):
         layout.addWidget(self.tabs)
         widget.setLayout(layout)
         self.setCentralWidget(widget)
-        from lgsip.engine.gates.io import BinaryInput, BinaryOutput
-        from lgsip.engine.gates.basic import And
-        bi1 = BinaryInput(True)
-        bi2 = BinaryInput(True)
-        and_ = And(2)
-        bo = BinaryOutput()
-        bi1.addWire((and_, 0))
-        bi2.addWire((and_, 1))
-        and_.addWire((bo, 0))
-        from time import sleep
-        sleep(2)
-        print(bo.compute())
+        #from lgsip.engine.gates.io import BinaryInput, BinaryOutput
+        #from lgsip.engine.gates.basic import And
+        #bi1 = BinaryInput(True)
+        #bi2 = BinaryInput(True)
+        #and_ = And(2)
+        #bo = BinaryOutput()
+        #bi1.addWire((and_, 0))
+        #bi2.addWire((and_, 1))
+        #and_.addWire((bo, 0))
+        #from time import sleep
+        #sleep(2)
+        #print(bo.compute())
 
 
 def run():
