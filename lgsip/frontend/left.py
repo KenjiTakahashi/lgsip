@@ -52,7 +52,7 @@ class LgsipBasicGatesBox(QtGui.QTreeWidget):
         self.setExpandsOnDoubleClick(False)
         self.header().close()
         self.itemClicked.connect(self._expandCollapse)
-        for category in ['IO', 'Basic']:
+        for category in ['IO', 'Basic', 'Compound']:
             item = QtGui.QTreeWidgetItem([category])
             self.addTopLevelItem(item)
             module = self._module + category.lower()

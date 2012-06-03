@@ -15,29 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lgsip.frontend.gates.gate import BasicGate
-from PyQt4.QtGui import QPolygonF
-from PyQt4.QtCore import QPointF
+from lgsip.frontend.gates import basic
 
 
-class And(BasicGate):
+class Nand(basic.And):
     def __init__(self, inputs=2, parent=None):
-        super(And, self).__init__(inputs, parent=parent)
-        self.path.moveTo(40, self.h / 2)
-        self.path.arcTo(20, 0, 40, self.h, -90, 180)
-        self.path.addRect(20, 0, 20, self.h)
-
-
-class Or(BasicGate):
-    def __init__(self, inputs=2, parent=None):
-        super(Or, self).__init__(inputs, parent=parent)
-
-
-class Not(BasicGate):
-    def __init__(self, inputs=2, parent=None):
-        super(Not, self).__init__(inputs, parent=parent)
-        self.path.addPolygon(QPolygonF([
-            QPointF(20, 0), QPointF(60, self.h / 2 - 2),
-            QPointF(60, self.h / 2 + 2), QPointF(20, self.h)
-        ]))
+        super(Nand, self).__init__(inputs, parent)
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)

@@ -186,3 +186,13 @@ class BasicGate(Gate):
         self.removeWire.move(20, -2)
         self.addWire = AddWireButton(self)
         self.addWire.move(20, self.h - 16)
+
+
+class InputGate(Gate):
+    def __init__(self, outputs=1, parent=None):
+        super(InputGate, self).__init__(0, outputs, parent)
+
+
+class OutputGate(Gate):
+    def __init__(self, inputs=1, parent=None):
+        super(OutputGate, self).__init__(inputs, 0, parent)
