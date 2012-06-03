@@ -21,6 +21,6 @@ from lgsip.frontend.gates.gate import BasicGate
 class And(BasicGate):
     def __init__(self, inputs=2, parent=None):
         super(And, self).__init__(inputs, parent=parent)
-        self.path.moveTo(30, self.h / 2)
-        self.path.arcTo(10, 0, 40, self.h, -90, 180)
-        self.path.addRect(10, 0, 20, self.h)
+        self.path.moveTo(40, self.h / 2)
+        self.path.arcTo(20, 0, 40, self.h, -90, 180)
+        self.path.addRect(20, 0, 20, self.h)

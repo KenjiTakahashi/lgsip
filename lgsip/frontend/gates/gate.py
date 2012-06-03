@@ -80,8 +80,8 @@ class DesintegrateGateButton(_LgsipGateButton):
 class WireButton(_LgsipGateButton):
     def __init__(self, parent=None):
         super(WireButton, self).__init__(parent)
-        self.setFixedSize(QSize(10, 4))
-        self.path.addRect(0, 0, 10, 4)
+        self.setFixedSize(QSize(20, 4))
+        self.path.addRect(0, 0, 20, 4)
         self.color = QtGui.QPalette().mid()
 
 
@@ -91,8 +91,10 @@ class Gate(QtGui.QWidget):
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
         self._sketched = False
+        self._integrated = False
         self._wires = list()
         self.setStyleSheet('background-color: transparent;')
+        self.setFixedWidth(80)
         self.offset = QPoint()
         self.path = QtGui.QPainterPath()
         self.h = 24 + 24 * (inputs - 1)
@@ -104,9 +106,19 @@ class Gate(QtGui.QWidget):
         delta = self.h / (outputs + 1)
         for i in range(1, outputs + 1):
             button = WireButton(self)
-            button.move(50, delta * i - 2)
+            button.move(60, delta * i - 2)
             button.clicked.connect(self._wiringOut)
-        self.setFixedWidth(60)
+        self._drawButtons()
+
+    def _drawButtons(self):
+        delta = self.h / 2
+        self.delete = DeleteGateButton(self)
+        if self._integrated:
+            self.delete.move(20, delta - 16)
+            self.desintegrate = DesintegrateGateButton(self)
+            self.desintegrate.move(20, delta - 4)
+        else:
+            self.delete.move(20, delta - 8)
 
     def _wiringIn(self):
         pos = self.sender().pos()
@@ -114,7 +126,7 @@ class Gate(QtGui.QWidget):
 
     def _wiringOut(self):
         pos = self.sender().pos()
-        self.wiring.emit(60, pos.y() + 2, 1)
+        self.wiring.emit(80, pos.y() + 2, 1)
 
     def setSketched(self, val):
         self._sketched = val
@@ -164,18 +176,13 @@ class Gate(QtGui.QWidget):
         self.offset = QPoint()
 
     def sizeHint(self):
-        return QSize(60, self.h)
+        return QSize(80, self.h)
 
 
 class BasicGate(Gate):
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(BasicGate, self).__init__(inputs, outputs, parent)
         self.removeWire = RemoveWireButton(self)
-        self.removeWire.move(10, -2)
-        delta = self.h / 2
-        self.delete = DeleteGateButton(self)  # move it to Gate
-        self.delete.move(10, delta - 16)
-        self.desintegrate = DesintegrateGateButton(self)
-        self.desintegrate.move(10, delta - 4)
+        self.removeWire.move(20, -2)
         self.addWire = AddWireButton(self)
-        self.addWire.move(10, self.h - 16)
+        self.addWire.move(20, self.h - 16)
