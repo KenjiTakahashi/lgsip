@@ -15,12 +15,50 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from lgsip.frontend.gates.gate import InputGate, OutputGate
 from PyQt4 import QtGui
+from PyQt4.QtCore import Qt, pyqtSignal
 
 
-class BinaryInput(QtGui.QWidget):
-    pass
+class _SwitchButton(QtGui.QPushButton):
+    def __init__(self, parent=None):
+        super(_SwitchButton, self).__init__(parent)
+        self.setCheckable(True)
+        self.setFixedSize(18, 18)
+        self.move(38, 3)
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+        if self.isChecked():
+            painter.setBrush(QtGui.QBrush(QtGui.QColor(160, 0, 0)))
+        else:
+            painter.setBrush(QtGui.QPalette().light())
+        painter.drawRect(0, 0, self.width(), self.height())
 
 
-class BinaryOutput(QtGui.QWidget):
-    pass
+class BinaryInput(InputGate):
+    switched = pyqtSignal(bool)
+
+    def __init__(self, parent=None):
+        super(BinaryInput, self).__init__(parent=parent)
+        self.path.addRect(20, 0, 40, self.h)
+        self._switch = _SwitchButton(self)
+        self._switch.clicked.connect(self._switched)
+
+    def _switched(self):
+        self._switched.emit(self.switch.isChecked())
+
+
+class BinaryOutput(OutputGate):
+    def __init__(self, parent=None):
+        super(BinaryOutput, self).__init__(parent=parent)
+        self.path.addRect(20, 0, 40, self.h)
+        self._switch = _SwitchButton(self)
+        self._switch.setEnabled(False)
+
+    def switch(self, value=None):
+        if not value:
+            value = not self._switch.isChecked()
+        self._switch.setChecked(value)

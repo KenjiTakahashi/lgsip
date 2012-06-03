@@ -97,7 +97,12 @@ class Gate(QtGui.QWidget):
         self.setFixedWidth(80)
         self.offset = QPoint()
         self.path = QtGui.QPainterPath()
-        self.h = 24 + 24 * (inputs - 1)
+        if inputs:
+            self.h = 24 + 24 * (inputs - 1)
+        elif outputs:
+            self.h = 24 + 24 * (outputs - 1)
+        else:  # this should never happen
+            self.h = 40
         delta = self.h / (inputs + 1)
         for i in range(1, inputs + 1):
             button = WireButton(self)

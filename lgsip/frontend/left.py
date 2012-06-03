@@ -58,10 +58,11 @@ class LgsipBasicGatesBox(QtGui.QTreeWidget):
             module = self._module + category.lower()
             g = pyclbr.readmodule(module)
             for gate in g.keys():
-                subitem = QtGui.QTreeWidgetItem()
-                item.addChild(subitem)
-                module_ = __import__(module, globals(), locals(), gate)
-                self.setItemWidget(subitem, 0, getattr(module_, gate)())
+                if gate[0] != '_':
+                    subitem = QtGui.QTreeWidgetItem()
+                    item.addChild(subitem)
+                    module_ = __import__(module, globals(), locals(), gate)
+                    self.setItemWidget(subitem, 0, getattr(module_, gate)())
         self.expandAll()
 
     def _expandCollapse(self, item):
