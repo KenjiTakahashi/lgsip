@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.frontend.gates.gate import BasicGate
-from PyQt4.QtGui import QPolygonF
+from PyQt4 import QtGui
 from PyQt4.QtCore import QPointF
 
 
@@ -31,12 +31,17 @@ class And(BasicGate):
 class Or(BasicGate):
     def __init__(self, inputs=2, parent=None):
         super(Or, self).__init__(inputs, parent=parent)
+        self.path.moveTo(15, 0)
+        self.path.quadTo(QPointF(25, self.h / 2), QPointF(15, self.h))
+        self.path.quadTo(QPointF(45, self.h + 2), QPointF(60, self.h / 2 + 2))
+        self.path.lineTo(60, self.h / 2 - 2)
+        self.path.quadTo(QPointF(45, -2), QPointF(15, 0))
 
 
 class Not(BasicGate):
     def __init__(self, inputs=2, parent=None):
         super(Not, self).__init__(inputs, parent=parent)
-        self.path.addPolygon(QPolygonF([
+        self.path.addPolygon(QtGui.QPolygonF([
             QPointF(20, 0), QPointF(60, self.h / 2 - 2),
             QPointF(60, self.h / 2 + 2), QPointF(20, self.h)
         ]))

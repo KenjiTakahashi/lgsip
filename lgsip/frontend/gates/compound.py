@@ -16,9 +16,38 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.frontend.gates import basic
+from PyQt4.QtCore import QPointF
+from PyQt4 import QtGui
 
 
 class Nand(basic.And):
     def __init__(self, inputs=2, parent=None):
         super(Nand, self).__init__(inputs, parent)
+        self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
+
+
+class Nor(basic.Or):
+    def __init__(self, inputs=2, parent=None):
+        super(Nor, self).__init__(inputs, parent)
+        self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
+
+
+class Xor(basic.Or):
+    def __init__(self, inputs=2, parent=None):
+        super(Xor, self).__init__(inputs, parent)
+        self.path2 = QtGui.QPainterPath()
+        self.path2.moveTo(10, 0)
+        self.path2.quadTo(QPointF(20, self.h / 2), QPointF(10, self.h))
+
+    def paintEvent(self, event):
+        super(Xor, self).paintEvent(event)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        pen = QtGui.QPen(QtGui.QPalette().mid(), 2)
+        painter.strokePath(self.path2, pen)
+
+
+class Xnor(Xor):
+    def __init__(self, inputs=2, parent=None):
+        super(Xnor, self).__init__(inputs, parent)
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
