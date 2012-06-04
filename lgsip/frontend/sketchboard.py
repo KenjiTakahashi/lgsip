@@ -55,7 +55,7 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def mousePressEvent(self, event):
         if self._wire and event.button() == Qt.RightButton:
             self.removeItem(self._wire)
-            self._sender.parent().removeWire(self._wire, 0)
+            self._sender.removeWire(self._wire, 0)
             self._wire = None
             self._sender = None
         super(_LgsipScene, self).mousePressEvent(event)

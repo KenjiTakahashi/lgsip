@@ -40,11 +40,11 @@ class _Delegate(QtGui.QStyledItemDelegate):
             )
 
 
-class LgsipBasicGatesBox(QtGui.QTreeWidget):
+class _LgsipGatesWidget(QtGui.QTreeWidget):
     _module = 'lgsip.frontend.gates.'
 
-    def __init__(self, parent=None):
-        super(LgsipBasicGatesBox, self).__init__(parent)
+    def __init__(self, categories, parent=None):
+        super(_LgsipGatesWidget, self).__init__(parent)
         self.setRootIsDecorated(False)
         self.setItemDelegate(_Delegate())
         self.setIndentation(0)
@@ -52,10 +52,14 @@ class LgsipBasicGatesBox(QtGui.QTreeWidget):
         self.setExpandsOnDoubleClick(False)
         self.header().close()
         self.itemClicked.connect(self._expandCollapse)
-        for category in ['IO', 'Basic', 'Compound']:
+        for category in categories:
+            if isinstance(category, str):
+                module = self._module + category.lower()
+            else:
+                category, module = category
+                module = self._module + module
             item = QtGui.QTreeWidgetItem([category])
             self.addTopLevelItem(item)
-            module = self._module + category.lower()
             g = pyclbr.readmodule(module)
             for gate in g.keys():
                 if gate[0] != '_':
@@ -70,3 +74,18 @@ class LgsipBasicGatesBox(QtGui.QTreeWidget):
             self.collapseItem(item)
         else:
             self.expandItem(item)
+
+
+class LgsipBasicGatesWidget(_LgsipGatesWidget):
+    def __init__(self, parent=None):
+        super(LgsipBasicGatesWidget, self).__init__(
+            ['IO', 'Basic', 'Compound'], parent
+        )
+
+
+class LgsipComplexGatesWidget(_LgsipGatesWidget):
+    def __init__(self, parent=None):
+        super(LgsipComplexGatesWidget, self).__init__(
+            [('Built-in', 'complex')], parent
+        )
+        # add user-defined here (from .config/...)

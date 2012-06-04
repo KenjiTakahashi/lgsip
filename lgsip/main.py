@@ -17,7 +17,10 @@
 
 from PyQt4 import QtGui
 from lgsip.frontend.center import LgsipTabWidget
-from lgsip.frontend.left import LgsipBasicGatesBox
+from lgsip.frontend.treewidgets import(
+    LgsipBasicGatesWidget, LgsipComplexGatesWidget
+)
+#from lgsip.frontend.left import LgsipBasicGatesBox
 
 
 class Main(QtGui.QMainWindow):
@@ -25,11 +28,13 @@ class Main(QtGui.QMainWindow):
         super(Main, self).__init__()
         widget = QtGui.QWidget()
         layout = QtGui.QHBoxLayout()
-        self.basicgates = LgsipBasicGatesBox()
+        self.basicgates = LgsipBasicGatesWidget()
+        self.complexgates = LgsipComplexGatesWidget()
         self.tabs = LgsipTabWidget()
         self.tabs.addTab()
         layout.addWidget(self.basicgates)
         layout.addWidget(self.tabs)
+        layout.addWidget(self.complexgates)
         widget.setLayout(layout)
         self.setCentralWidget(widget)
         #from lgsip.engine.gates.io import BinaryInput, BinaryOutput
