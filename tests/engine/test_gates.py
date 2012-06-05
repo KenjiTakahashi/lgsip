@@ -42,11 +42,10 @@ class TestBinaryInput(object):
         self.i.wait()
 
 
-from nose.tools import timed
-#from PyQt4.QtCore import QCoreApplication
+from PyQt4.QtCore import QCoreApplication
 
-#import sys
-#app = QCoreApplication(sys.argv)
+import sys
+app = QCoreApplication(sys.argv)
 
 
 class TestAnd(object):
@@ -60,11 +59,12 @@ class TestAnd(object):
 
     def _increment(self, _, __):
         self._count += 1
-        print(self._count)
+        if self._count == self._limit:
+            app.quit()
 
-    def _wait(self, result):
-        while self._count < 1 and self.o.compute() != result:
-            pass
+    def _wait(self):
+        if self._limit > 0:
+            app.exec_()
 
     def _prepare(self, i1, i2):
         self.i1 = io.BinaryInput(i1)
@@ -74,28 +74,28 @@ class TestAnd(object):
         self.i1.valueChanged.connect(self._increment)
         self.i2.valueChanged.connect(self._increment)
 
-    @timed(10)
     def test_should_be_false_when_first_value_is_false(self):
         self._prepare(False, True)
-        self._wait(False)
+        self._limit = 0
+        self._wait()
         assert self.o.compute() == False
 
-    @timed(10)
     def test_should_be_false_when_second_value_is_false(self):
         self._prepare(True, False)
-        self._wait(False)
+        self._limit = 0
+        self._wait()
         assert self.o.compute() == False
 
-    @timed(10)
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._wait(False)
+        self._limit = 1
+        self._wait()
         assert self.o.compute() == False
 
-    @timed(10)
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._wait(True)
+        self._limit = 3
+        self._wait()
         assert self.o.compute() == True
 
     def tearDown(self):

@@ -26,7 +26,6 @@ class _Gate(QThread):
         super(_Gate, self).__init__()
         self._inputs = list()
         self._gates = list()
-        self._changed = False
         self._running = True
         self.start()
 
@@ -47,7 +46,6 @@ class _Gate(QThread):
         try:
             if self._inputs[index] != value:
                 self._inputs[index] = value
-                self._changed = True
                 self.valueChanged.emit(index, value)
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
