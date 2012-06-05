@@ -52,13 +52,11 @@ class TestAnd(object):
     def setUp(self):
         self._count = 0
         self.a = basic.And(2)
-        self.o = io.BinaryOutput()
-        self.a.addWire(self.o, 0)
         self.a.valueChanged.connect(self._increment)
-        self.o.valueChanged.connect(self._increment)
 
     def _increment(self, _, __):
         self._count += 1
+        print(self._count)
         if self._count == self._limit:
             app.quit()
 
@@ -78,32 +76,30 @@ class TestAnd(object):
         self._prepare(False, True)
         self._limit = 0
         self._wait()
-        assert self.o.compute() == False
+        assert self.a.compute() == False
 
     def test_should_be_false_when_second_value_is_false(self):
         self._prepare(True, False)
         self._limit = 0
         self._wait()
-        assert self.o.compute() == False
+        assert self.a.compute() == False
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 1
+        self._limit = 0
         self._wait()
-        assert self.o.compute() == False
+        assert self.a.compute() == False
 
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 3
+        self._limit = 2
         self._wait()
-        assert self.o.compute() == True
+        assert self.a.compute() == True
 
     def tearDown(self):
         self.i1.die()
         self.i2.die()
         self.a.die()
-        self.o.die()
         self.i1.wait()
         self.i2.wait()
         self.a.wait()
-        self.o.wait()
