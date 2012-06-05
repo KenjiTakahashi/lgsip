@@ -25,8 +25,7 @@ class BinaryInput(IOGate):
         self._inputs.append(value)
 
     def switch(self):
-        self._inputs[0] = not self._inputs[0]
-        self.valueChanged.emit(self._inputs)
+        self.changeInput(0, not self._inputs[0])
 
     def compute(self):
         return self._inputs[0]
@@ -49,8 +48,7 @@ class Clock(QTimer, IOGate):
         self.start()
 
     def _timeout(self):
-        self._inputs[0] = not self._inputs[0]
-        self.valueChanged.emit(self._inputs)
+        self.changeInput(0, self._inputs[0])
 
     def slower(self):
         self.setInterval(self.interval() + 20)

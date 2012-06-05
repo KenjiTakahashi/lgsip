@@ -20,7 +20,6 @@ from lgsip.frontend.center import LgsipTabWidget
 from lgsip.frontend.treewidgets import(
     LgsipBasicGatesWidget, LgsipComplexGatesWidget
 )
-#from lgsip.frontend.left import LgsipBasicGatesBox
 
 
 class Main(QtGui.QMainWindow):

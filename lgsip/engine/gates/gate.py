@@ -20,41 +20,36 @@ from PyQt4.QtCore import QThread, pyqtSignal
 
 
 class _Gate(QThread):
+    valueChanged = pyqtSignal(int, bool)
+
     def __init__(self):
         super(_Gate, self).__init__()
         self._inputs = list()
         self._gates = list()
         self._changed = False
-        #self._output = False
         self._running = True
         self.start()
 
     def run(self):
         while self._running:
             self.msleep(1)
-            #if self._changed:
+            value = self.compute()
             for (gate, index) in self._gates:
-                gate.changeInput(index, self.compute())
-                #_newOutput = self.compute()
-                #if _newOutput != self._output:
-                    #self._output = _newOutput
-                    #for (gate, index) in self._gates:
-                        #gate.changeInput(index, self._output)
+                gate.changeInput(index, value)
 
     def die(self):
         self._running = False
 
-    def addWire(self, gate):
-        self._gates.append(gate)
+    def addWire(self, gate, index):
+        self._gates.append((gate, index))
 
     def changeInput(self, index, value):
         try:
-            #self._inputs[index] = value
             if self._inputs[index] != value:
                 self._inputs[index] = value
                 self._changed = True
+                self.valueChanged.emit(index, value)
         except IndexError:
-            print(1)
             raise lgsiperr.InvalidInputIndexError
 
     def compute(self):
@@ -70,4 +65,4 @@ class BasicGate(_Gate):
 
 
 class IOGate(_Gate):
-    valueChanged = pyqtSignal(list)
+    pass
