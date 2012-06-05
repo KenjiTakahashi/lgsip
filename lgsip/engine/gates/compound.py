@@ -18,25 +18,33 @@
 from lgsip.engine.gates.gate import BasicGate
 
 
-class And(BasicGate):
+class Nand(BasicGate):
     def __init__(self, inputs):
-        super(And, self).__init__(inputs, "And")
+        super(Nand, self).__init__(inputs, "Nand")
 
     def compute(self):
-        return all(x for x in self._inputs)
+        return not all(x for x in self._inputs)
 
 
-class Or(BasicGate):
+class Nor(BasicGate):
     def __init__(self, inputs):
-        super(Or, self).__init__(inputs, "Or")
+        super(Nor, self).__init__(inputs, "Nor")
 
     def compute(self):
-        return any(x for x in self._inputs)
+        return not any(x for x in self._inputs)
 
 
-class Not(BasicGate):
+class Xor(BasicGate):
     def __init__(self):
-        super(Not, self).__init__(1, "Not")
+        super(Xor, self).__init__(2, "Xor")
 
     def compute(self):
-        return not self._inputs[0]
+        return self._inputs[0] ^ self._inputs[1]
+
+
+class Xnor(BasicGate):
+    def __init__(self):
+        super(Xnor, self).__init__(2, "Xnor")
+
+    def compute(self):
+        return not self._inputs[0] ^ self._inputs[1]

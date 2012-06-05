@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lgsip.engine.gates import io, basic
+from lgsip.engine.gates import io, basic, compound
 
 
 class TestBinaryInput(object):
@@ -43,63 +43,252 @@ class TestBinaryInput(object):
 
 
 from PyQt4.QtCore import QCoreApplication
-
 import sys
-app = QCoreApplication(sys.argv)
 
 
-class TestAnd(object):
+class _BasicGateTest(object):
     def setUp(self):
+        self.app = QCoreApplication(sys.argv)
         self._count = 0
-        self.a = basic.And(2)
-        self.a.valueChanged.connect(self._increment)
 
     def _increment(self, _, __):
         self._count += 1
-        print(self._count)
         if self._count == self._limit:
-            app.quit()
+            self.app.quit()
 
     def _wait(self):
         if self._limit > 0:
-            app.exec_()
+            self.app.exec_()
 
     def _prepare(self, i1, i2):
         self.i1 = io.BinaryInput(i1)
         self.i2 = io.BinaryInput(i2)
-        self.i1.addWire(self.a, 0)
-        self.i2.addWire(self.a, 1)
+        self.i1.addWire(self.g, 0)
+        self.i2.addWire(self.g, 1)
         self.i1.valueChanged.connect(self._increment)
         self.i2.valueChanged.connect(self._increment)
 
-    def test_should_be_false_when_first_value_is_false(self):
-        self._prepare(False, True)
-        self._limit = 0
-        self._wait()
-        assert self.a.compute() == False
+    def tearDown(self):
+        self.i1.die()
+        self.i2.die()
+        self.g.die()
+        self.i1.wait()
+        self.i2.wait()
+        self.g.wait()
 
-    def test_should_be_false_when_second_value_is_false(self):
-        self._prepare(True, False)
-        self._limit = 0
-        self._wait()
-        assert self.a.compute() == False
+
+class TestOr(_BasicGateTest):
+    def setUp(self):
+        super(TestOr, self).setUp()
+        self.g = basic.Or(2)
+        self.g.valueChanged.connect(self._increment)
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
         self._limit = 0
         self._wait()
-        assert self.a.compute() == False
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_first_value_is_true(self):
+        self._prepare(True, False)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_true_when_second_value_is_true(self):
+        self._prepare(False, True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
 
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
         self._limit = 2
         self._wait()
-        assert self.a.compute() == True
+        assert self.g.compute() == True
+
+
+class TestAnd(_BasicGateTest):
+    def setUp(self):
+        super(TestAnd, self).setUp()
+        self.g = basic.And(2)
+        self.g.valueChanged.connect(self._increment)
+
+    def test_should_be_false_when_first_value_is_false(self):
+        self._prepare(False, True)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_second_value_is_false(self):
+        self._prepare(True, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_both_values_are_false(self):
+        self._prepare(False, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_both_values_are_true(self):
+        self._prepare(True, True)
+        self._limit = 2
+        self._wait()
+        assert self.g.compute() == True
+
+
+class TestNand(_BasicGateTest):
+    def setUp(self):
+        super(TestNand, self).setUp()
+        self.g = compound.Nand(2)
+        self.g.valueChanged.connect(self._increment)
+
+    def test_should_be_true_when_first_value_is_true(self):
+        self._prepare(True, False)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_true_when_second_value_is_true(self):
+        self._prepare(False, True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_true_when_both_values_are_false(self):
+        self._prepare(False, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_false_when_both_values_are_true(self):
+        self._prepare(True, True)
+        self._limit = 2
+        self._wait()
+        assert self.g.compute() == False
+
+
+class TestNor(_BasicGateTest):
+    def setUp(self):
+        super(TestNor, self).setUp()
+        self.g = compound.Nor(2)
+        self.g.valueChanged.connect(self._increment)
+
+    def test_should_be_false_when_first_value_is_true(self):
+        self._prepare(True, False)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_second_value_is_true(self):
+        self._prepare(False, True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_both_values_are_true(self):
+        self._prepare(True, True)
+        self._limit = 2
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_both_values_are_false(self):
+        self._prepare(False, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == True
+
+
+class TestXor(_BasicGateTest):
+    def setUp(self):
+        super(TestXor, self).setUp()
+        self.g = compound.Xor()
+        self.g.valueChanged.connect(self._increment)
+
+    def test_should_be_false_when_both_values_are_false(self):
+        self._prepare(False, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_both_values_are_true(self):
+        self._prepare(True, True)
+        self._limit = 2
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_first_value_is_true(self):
+        self._prepare(True, False)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_true_when_second_value_is_true(self):
+        self._prepare(False, True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == True
+
+
+class TestXnor(_BasicGateTest):
+    def setUp(self):
+        super(TestXnor, self).setUp()
+        self.g = compound.Xnor()
+        self.g.valueChanged.connect(self._increment)
+
+    def test_should_be_false_when_first_value_is_true(self):
+        self._prepare(True, False)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_false_when_second_value_is_true(self):
+        self._prepare(False, True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_both_values_are_false(self):
+        self._prepare(False, False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == True
+
+    def test_should_be_true_when_both_values_are_true(self):
+        self._prepare(True, True)
+        self._limit = 2
+        self._wait()
+        assert self.g.compute() == True
+
+
+class TestNot(_BasicGateTest):
+    def setUp(self):
+        self.app = QCoreApplication(sys.argv)
+        self._count = 0
+        self.g = basic.Not()
+        self.g.valueChanged.connect(self._increment)
+
+    def _prepare(self, i):
+        self.i = io.BinaryInput(i)
+        self.i.addWire(self.g, 0)
+        self.i.valueChanged.connect(self._increment)
+
+    def test_should_be_false_when_value_is_true(self):
+        self._prepare(True)
+        self._limit = 1
+        self._wait()
+        assert self.g.compute() == False
+
+    def test_should_be_true_when_value_is_false(self):
+        self._prepare(False)
+        self._limit = 0
+        self._wait()
+        assert self.g.compute() == True
 
     def tearDown(self):
-        self.i1.die()
-        self.i2.die()
-        self.a.die()
-        self.i1.wait()
-        self.i2.wait()
-        self.a.wait()
+        self.i.die()
+        self.g.die()
+        self.i.wait()
+        self.g.wait()
