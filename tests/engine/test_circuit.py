@@ -56,47 +56,61 @@ class TestSimpleCircuit(GateTest):
     def test_should_be_true_when_values_are_false_true_true(self):
         self._prepare(False, True, True)
         self._limit = [
-            [self.n, self.o, self.a2, self.a2],
-            [self.n, self.a1, self.o, self.a2, self.a2]
+            [self.n, self.a2, self.a2, self.o],
+            [self.a1, self.n, self.a1, self.a2, self.a2, self.o]
         ]
         self._wait()
         assert self.o.compute() == True
 
-    #def test_should_be_true_when_values_are_true_false_true(self):
-        #self._prepare(True, False, True)
-        #self._limit = 3
-        #self._wait()
-        #assert self.o.compute() == True
+    def test_should_be_true_when_values_are_true_false_true(self):
+        self._prepare(True, False, True)
+        self._limit = [
+            [self.a1, self.a1, self.a2, self.o]
+        ]
+        self._wait()
+        assert self.o.compute() == True
 
-    #def test_should_be_false_when_values_are_false_false_true(self):
-        #self._prepare(False, False, True)
-        #self._limit = 2
-        #self._wait()
-        #assert self.o.compute() == False
+    def test_should_be_false_when_values_are_false_false_true(self):
+        self._prepare(False, False, True)
+        self._limit = [
+            [self.a1, self.a2]
+        ]
+        self._wait()
+        assert self.o.compute() == False
 
-    #def test_should_be_false_when_values_are_true_true_false(self):
-        #self._prepare(True, True, False)
-        #self._limit = 3
-        #self._wait()
-        #assert self.o.compute() == False
+    def test_should_be_false_when_values_are_true_true_false(self):
+        self._prepare(True, True, False)
+        self._limit = [
+            [self.a1, self.n, self.a2],
+            [self.a1, self.n, self.a1, self.o, self.a1, self.o, self.a2]
+        ]
+        self._wait()
+        assert self.o.compute() == False
 
-    #def test_should_be_false_when_values_are_false_true_false(self):
-        #self._prepare(False, True, False)
-        #self._limit = 2
-        #self._wait()
-        #assert self.o.compute() == False
+    def test_should_be_false_when_values_are_false_true_false(self):
+        self._prepare(False, True, False)
+        self._limit = [
+            [self.n, self.a2],
+            [self.a1, self.n, self.a1, self.a2]
+        ]
+        self._wait()
+        assert self.o.compute() == False
 
-    #def test_should_be_true_when_values_are_true_false_false(self):
-        #self._prepare(True, False, False)
-        #self._limit = 2
-        #self._wait()
-        #assert self.o.compute() == True
+    def test_should_be_true_when_values_are_true_false_false(self):
+        self._prepare(True, False, False)
+        self._limit = [
+            [self.a1, self.a1, self.o]
+        ]
+        self._wait()
+        assert self.o.compute() == True
 
-    #def test_should_be_false_when_values_are_false_false_false(self):
-        #self._prepare(False, False, False)
-        #self._limit = 1
-        #self._wait()
-        #assert self.o.compute() == False
+    def test_should_be_false_when_values_are_false_false_false(self):
+        self._prepare(False, False, False)
+        self._limit = [
+            [self.a1]
+        ]
+        self._wait()
+        assert self.o.compute() == False
 
     def tearDown(self):
         self.i1.die()
