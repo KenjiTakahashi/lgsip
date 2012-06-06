@@ -127,3 +127,11 @@ class TestSimpleCircuit(GateTest):
         self.a2.wait()
         self.o.wait()
         self.n.wait()
+
+
+class TestJKLatch(GateTest):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass

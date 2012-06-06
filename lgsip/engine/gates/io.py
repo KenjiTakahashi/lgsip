@@ -40,21 +40,24 @@ class BinaryOutput(IOGate):
         return self._inputs[0]
 
 
-class Clock(QTimer, IOGate):
+class Clock(IOGate):
     def __init__(self, timeout):
         super(Clock, self).__init__()
-        self.setInterval(timeout)
-        self.timeout.connect(self._timeout)
+        self._inputs.append(False)
+        self._timer = QTimer()
+        self._timer.setInterval(timeout)
+        self._timer.timeout.connect(self._timeout)
+        self._timer.start()
         self.start()
 
     def _timeout(self):
-        self.changeInput(0, self._inputs[0])
+        self.changeInput(0, not self._inputs[0])
 
     def slower(self):
-        self.setInterval(self.interval() + 20)
+        self._timer.setInterval(self.interval() + 20)
 
     def faster(self):
-        self.setInterval(self.interval() - 20)
+        self._timer.setInterval(self.interval() - 20)
 
     def compute(self):
         return self._inputs[0]

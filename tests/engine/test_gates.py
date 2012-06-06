@@ -43,6 +43,30 @@ class TestBinaryInput(object):
         self.i.wait()
 
 
+class TestClock(GateTest):
+    def setUp(self):
+        super(TestClock, self).setUp()
+        self.c = io.Clock(10)
+        self.o = io.BinaryOutput()
+        self.c.addWire(self.o, 0)
+        self.o.valueChanged.connect(self._increment)
+
+    def test_should_tick(self):
+        self._limit = [[self.o]]
+        self._wait()
+        assert self.c.compute() == True
+        self._limit = [[self.o, self.o]]
+        self._wait()
+        assert self.c.compute() == False
+        self._limit = [[self.o, self.o, self.o]]
+        self._wait()
+        assert self.c.compute() == True
+
+    def tearDown(self):
+        self.c.die()
+        self.c.wait()
+
+
 class _BasicGateTest(GateTest):
     def _prepare(self, i1, i2):
         self.i1 = io.BinaryInput(i1)
