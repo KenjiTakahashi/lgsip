@@ -28,62 +28,6 @@ class CircuitTest extends mutable.Specification {
     }
 
     "A Simple Circuit" should {
-        "return true for (true, true, true)" in {
-            val (circuit, o) = ASimpleCircuit(true, true, true)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(true)
-        }
-        "return true for (false, true, true)" in {
-            val (circuit, o) = ASimpleCircuit(false, true, true)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(true)
-        }
-        "return true for (true, false, true)" in {
-            val (circuit, o) = ASimpleCircuit(true, false, true)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(true)
-        }
-        "return false for (false, false, true)" in {
-            val (circuit, o) = ASimpleCircuit(false, false, true)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(false)
-        }
-        "return false for (true, true, false)" in {
-            val (circuit, o) = ASimpleCircuit(true, true, false)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(false)
-        }
-        "return false for (false, true, false)" in {
-            val (circuit, o) = ASimpleCircuit(false, true, false)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(false)
-        }
-        "return true for (true, false, false)" in {
-            val (circuit, o) = ASimpleCircuit(true, false, false)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(true)
-        }
-        "return false for (false, false, false)" in {
-            val (circuit, o) = ASimpleCircuit(false, false, false)
-            circuit.step()
-            circuit.step()
-            circuit.step()
-            o.compute should beEqualTo(false)
-        }
         "properly intergrate, thus giving possibility to connect another wires and give proper results" in {
             val (circuit, o) = ASimpleCircuit(true, true, true)
             circuit.step()

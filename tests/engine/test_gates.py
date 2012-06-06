@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.engine.gates import io, basic, compound
+from tests.helpers import GateTest
 
 
 class TestBinaryInput(object):
@@ -42,24 +43,7 @@ class TestBinaryInput(object):
         self.i.wait()
 
 
-from PyQt4.QtCore import QCoreApplication
-import sys
-
-
-class _BasicGateTest(object):
-    def setUp(self):
-        self.app = QCoreApplication(sys.argv)
-        self._count = 0
-
-    def _increment(self, _, __):
-        self._count += 1
-        if self._count == self._limit:
-            self.app.quit()
-
-    def _wait(self):
-        if self._limit > 0:
-            self.app.exec_()
-
+class _BasicGateTest(GateTest):
     def _prepare(self, i1, i2):
         self.i1 = io.BinaryInput(i1)
         self.i2 = io.BinaryInput(i2)
@@ -85,25 +69,25 @@ class TestOr(_BasicGateTest):
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_first_value_is_true(self):
         self._prepare(True, False)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_second_value_is_true(self):
         self._prepare(False, True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == True
 
@@ -116,25 +100,25 @@ class TestAnd(_BasicGateTest):
 
     def test_should_be_false_when_first_value_is_false(self):
         self._prepare(False, True)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_second_value_is_false(self):
         self._prepare(True, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == True
 
@@ -147,25 +131,25 @@ class TestNand(_BasicGateTest):
 
     def test_should_be_true_when_first_value_is_true(self):
         self._prepare(True, False)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_second_value_is_true(self):
         self._prepare(False, True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_false_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == False
 
@@ -178,25 +162,25 @@ class TestNor(_BasicGateTest):
 
     def test_should_be_false_when_first_value_is_true(self):
         self._prepare(True, False)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_second_value_is_true(self):
         self._prepare(False, True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == True
 
@@ -209,25 +193,25 @@ class TestXor(_BasicGateTest):
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_first_value_is_true(self):
         self._prepare(True, False)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_second_value_is_true(self):
         self._prepare(False, True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == True
 
@@ -240,33 +224,32 @@ class TestXnor(_BasicGateTest):
 
     def test_should_be_false_when_first_value_is_true(self):
         self._prepare(True, False)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_false_when_second_value_is_true(self):
         self._prepare(False, True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_both_values_are_false(self):
         self._prepare(False, False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == True
 
     def test_should_be_true_when_both_values_are_true(self):
         self._prepare(True, True)
-        self._limit = 2
+        self._limit = [[self.g, self.g]]
         self._wait()
         assert self.g.compute() == True
 
 
-class TestNot(_BasicGateTest):
+class TestNot(GateTest):
     def setUp(self):
-        self.app = QCoreApplication(sys.argv)
-        self._count = 0
+        super(TestNot, self).setUp()
         self.g = basic.Not()
         self.g.valueChanged.connect(self._increment)
 
@@ -277,13 +260,13 @@ class TestNot(_BasicGateTest):
 
     def test_should_be_false_when_value_is_true(self):
         self._prepare(True)
-        self._limit = 1
+        self._limit = [[self.g]]
         self._wait()
         assert self.g.compute() == False
 
     def test_should_be_true_when_value_is_false(self):
         self._prepare(False)
-        self._limit = 0
+        self._limit = [[]]
         self._wait()
         assert self.g.compute() == True
 
