@@ -21,20 +21,23 @@ from PyQt4 import QtGui
 
 
 class Nand(basic.And):
-    def __init__(self, inputs=2, parent=None):
-        super(Nand, self).__init__(inputs, parent)
+    def _drawPath(self):
+        super(Nand, self)._drawPath()
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
 
 
 class Nor(basic.Or):
-    def __init__(self, inputs=2, parent=None):
-        super(Nor, self).__init__(inputs, parent)
+    def _drawPath(self):
+        super(Nor, self)._drawPath()
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
 
 
 class Xor(basic.Or):
-    def __init__(self, inputs=2, parent=None):
-        super(Xor, self).__init__(inputs, parent)
+    def __init__(self, parent=None):
+        super(Xor, self).__init__(2, parent=parent)
+
+    def _drawPath(self):
+        super(Xor, self)._drawPath()
         self.path2 = QtGui.QPainterPath()
         self.path2.moveTo(10, 0)
         self.path2.quadTo(QPointF(20, self.h / 2), QPointF(10, self.h))
@@ -48,6 +51,9 @@ class Xor(basic.Or):
 
 
 class Xnor(Xor):
-    def __init__(self, inputs=2, parent=None):
-        super(Xnor, self).__init__(inputs, parent)
+    def __init__(self, parent=None):
+        super(Xnor, self).__init__(parent)
+
+    def _drawPath(self):
+        super(Xnor, self)._drawPath()
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)

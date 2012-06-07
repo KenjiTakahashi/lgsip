@@ -21,16 +21,16 @@ from PyQt4.QtCore import QPointF
 
 
 class And(BasicGate):
-    def __init__(self, inputs=2, parent=None):
-        super(And, self).__init__(inputs, parent=parent)
+    def _drawPath(self):
+        super(And, self)._drawPath()
         self.path.moveTo(40, self.h / 2)
         self.path.arcTo(20, 0, 40, self.h, -90, 180)
         self.path.addRect(20, 0, 20, self.h)
 
 
 class Or(BasicGate):
-    def __init__(self, inputs=2, parent=None):
-        super(Or, self).__init__(inputs, parent=parent)
+    def _drawPath(self):
+        super(Or, self)._drawPath()
         self.path.moveTo(15, 0)
         self.path.quadTo(QPointF(25, self.h / 2), QPointF(15, self.h))
         self.path.quadTo(QPointF(45, self.h + 2), QPointF(60, self.h / 2 + 2))
@@ -39,8 +39,8 @@ class Or(BasicGate):
 
 
 class Not(BasicGate):
-    def __init__(self, inputs=2, parent=None):
-        super(Not, self).__init__(inputs, parent=parent)
+    def _drawPath(self):
+        super(Not, self)._drawPath()
         self.path.addPolygon(QtGui.QPolygonF([
             QPointF(20, 0), QPointF(60, self.h / 2 - 2),
             QPointF(60, self.h / 2 + 2), QPointF(20, self.h)
