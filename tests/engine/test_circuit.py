@@ -130,8 +130,60 @@ class TestSimpleCircuit(GateTest):
 
 
 class TestJKLatch(GateTest):
-    def setUp(self):
-        pass
+    def _prepare(self, i1, i2, i3):
+        self.j = io.BinaryInput(i1)
+        self.c = io.BinaryInput(i2)
+        self.k = io.BinaryInput(i3)
+        self.a1 = basic.And(3)
+        self.a2 = basic.And(3)
+        self.n1 = compound.Nor(2)
+        self.n2 = compound.Nor(2)
+        self.j.addWire(self.a1, 1)
+        self.k.addWire(self.a2, 1)
+        self.c.addWire(self.a1, 2)
+        self.c.addWire(self.a2, 2)
+        self.a1.addWire(self.n1, 0)
+        self.a2.addWire(self.n2, 0)
+        self.n1.addWire(self.a1, 0)
+        self.n2.addWire(self.a2, 0)
+        self.n1.addWire(self.n2, 1)
+        self.n2.addWire(self.n1, 1)
+        self.a1.valueChanged.connect(self._increment)
+        self.a2.valueChanged.connect(self._increment)
+        self.n1.valueChanged.connect(self._increment)
+        self.n2.valueChanged.connect(self._increment)
+
+    #def test_cyclic(self):
+        #self._prepare(True, True, True)
+        #begin = [self.a1, self.a1, self.a2, self.a2]
+        #first_list = begin + [self.a1, self.n2]
+        #second_list = begin + [self.a2, self.n1]
+        #self._limit = [first_list, second_list]
+        #self._wait()
+        #first = self.n1.compute() == False and self.n2.compute() == True
+        #second = self.n1.compute() == True and self.n2.compute() == False
+        #assert first or second
+        #first_list += [self.a1, self.n1]
+        #second_list += [self.a2, self.n2]
+        #self._limit = [first_list, second_list]
+        #self._wait()
+        #if first:
+            #assert self.n1.compute() == True and self.n2.compute() == False
+        #else:
+            #assert self.n1.compute() == False and self.n2.compute() == True
 
     def tearDown(self):
-        pass
+        self.j.die()
+        self.k.die()
+        self.c.die()
+        self.a1.die()
+        self.a2.die()
+        self.n1.die()
+        self.n2.die()
+        self.j.wait()
+        self.k.wait()
+        self.c.wait()
+        self.a1.wait()
+        self.a2.wait()
+        self.n1.wait()
+        self.n2.wait()
