@@ -110,18 +110,21 @@ class Gate(QtGui.QWidget):
             self.h = 24 + 24 * (self._outputs - 1)
         else:  # this should never happen
             self.h = 40
+        self.setFixedHeight(self.h)
         delta = self.h / (self._inputs + 1)
         for i in range(1, self._inputs + 1):
             button = WireButton(self)
             button.move(0, delta * i - 2)
             button.clicked.connect(self._wiringIn)
             self._buttons.add(button)
+            button.show()
         delta = self.h / (self._outputs + 1)
         for i in range(1, self._outputs + 1):
             button = WireButton(self)
             button.move(60, delta * i - 2)
             button.clicked.connect(self._wiringOut)
             self._buttons.add(button)
+            button.show()
 
     def _drawButtons(self):
         delta = self.h / 2
@@ -132,8 +135,10 @@ class Gate(QtGui.QWidget):
             self.desintegrate = DesintegrateGateButton(self)
             self.desintegrate.move(20, delta - 4)
             self._buttons.add(self.desintegrate)
+            self.desintegrate.show()
         else:
             self.delete.move(20, delta - 8)
+        self.delete.show()
 
     def _drawPath(self):
         self.path = QtGui.QPainterPath()
@@ -192,9 +197,14 @@ class BasicGate(Gate):
         self.removeWire = RemoveWireButton(self)
         self.removeWire.clicked.connect(self._removeWire)
         self.removeWire.move(20, -2)
+        self._drawWireButtons()
+
+    def _drawWireButtons(self):
         self.addWire = AddWireButton(self)
         self.addWire.clicked.connect(self._addWire)
         self.addWire.move(20, self.h - 16)
+        self._buttons.add(self.addWire)
+        self.addWire.show()
 
     def _addWire(self):
         self._inputs += 1
@@ -204,6 +214,7 @@ class BasicGate(Gate):
         self._drawWires()
         self._drawButtons()
         self._drawPath()
+        self._drawWireButtons()
         self.update()
 
     def _removeWire(self):
@@ -215,6 +226,7 @@ class BasicGate(Gate):
             self._drawWires()
             self._drawButtons()
             self._drawPath()
+            self._drawWireButtons()
             self.update()
 
 
