@@ -48,7 +48,7 @@ class BinaryInput(InputGate):
         self._switch.clicked.connect(self._switched)
 
     def _switched(self):
-        self._switched.emit(self.switch.isChecked())
+        self.switched.emit(self._switch.isChecked())
 
 
 class BinaryOutput(OutputGate):

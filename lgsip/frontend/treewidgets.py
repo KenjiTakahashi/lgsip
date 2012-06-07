@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QSize, QMimeData
 import pyclbr
 
 
@@ -38,6 +38,15 @@ class _Delegate(QtGui.QStyledItemDelegate):
                 options.rect, Qt.AlignVCenter | Qt.AlignCenter,
                 index.data(Qt.DisplayRole)
             )
+        else:
+            pixmap = index.data(666)
+            painter.drawPixmap(10, option.rect.y() + 10, pixmap)
+
+    def sizeHint(self, option, index):
+        size = super(_Delegate, self).sizeHint(option, index)
+        if not index.parent().isValid():
+            return size
+        return QSize(size.width(), index.data(666).height() + 20)
 
 
 class _LgsipGatesWidget(QtGui.QTreeWidget):
@@ -50,6 +59,7 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
         self.setIndentation(0)
         self.setFixedWidth(110)
         self.setExpandsOnDoubleClick(False)
+        self.setDragDropMode(self.DragOnly)
         self.header().close()
         self.itemClicked.connect(self._expandCollapse)
         for category in categories:
@@ -66,7 +76,13 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
                     subitem = QtGui.QTreeWidgetItem()
                     item.addChild(subitem)
                     module_ = __import__(module, globals(), locals(), gate)
-                    self.setItemWidget(subitem, 0, getattr(module_, gate)())
+                    widget = getattr(module_, gate)()
+                    pixmap = QtGui.QPixmap(widget.sizeHint())
+                    pixmap.fill(Qt.transparent)
+                    widget.render(pixmap, flags=QtGui.QWidget.DrawChildren)
+                    subitem.setData(0, 666, pixmap)
+                    subitem.setData(0, 667, gate)
+                    subitem.setData(0, 668, module)
         self.expandAll()
 
     def _expandCollapse(self, item):
@@ -74,6 +90,17 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
             self.collapseItem(item)
         else:
             self.expandItem(item)
+
+    def startDrag(self, actions):
+        index = self.currentIndex()
+        if index.parent().isValid():
+            data = QMimeData()
+            data.setData('lgsip/x-classname', index.data(667))
+            data.setData('lgsip/x-modulename', index.data(668))
+            drag = QtGui.QDrag(self)
+            drag.setMimeData(data)
+            drag.setPixmap(index.data(666))
+            drag.start(Qt.CopyAction)
 
 
 class LgsipBasicGatesWidget(_LgsipGatesWidget):

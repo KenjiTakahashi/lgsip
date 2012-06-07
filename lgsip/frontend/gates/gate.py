@@ -16,7 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt, QSize, QPointF, QMimeData, QPoint, pyqtSignal
+from PyQt4.QtCore import Qt, QSize, QPointF, QPoint, pyqtSignal
 
 
 class _LgsipGateButton(QtGui.QPushButton):
@@ -125,7 +125,6 @@ class Gate(QtGui.QWidget):
 
     def _drawButtons(self):
         delta = self.h / 2
-        print(self)
         self.delete = DeleteGateButton(self)
         self._buttons.add(self.delete)
         if self._integrated:
@@ -169,17 +168,6 @@ class Gate(QtGui.QWidget):
     def mousePressEvent(self, event):
         if self._sketched:
             self.offset = event.pos()
-        else:
-            drag = QtGui.QDrag(self)
-            data = QMimeData()
-            data.setData('lgsip/x-classname', type(self).__name__)
-            data.setData('lgsip/x-modulename', type(self).__module__)
-            drag.setMimeData(data)
-            pixmap = QtGui.QPixmap(self.size())
-            pixmap.fill(Qt.transparent)
-            self.render(pixmap, flags=QtGui.QWidget.DrawChildren)
-            drag.setPixmap(pixmap)
-            drag.exec_()
 
     def mouseMoveEvent(self, event):
         if self._sketched:

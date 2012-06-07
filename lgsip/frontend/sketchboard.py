@@ -27,6 +27,9 @@ class _LgsipScene(QtGui.QGraphicsScene):
         self._direction = None
         self._sender = None
 
+    def dragEnterEvent(self, event):
+        print(1)
+
     def dropEvent(self, event):
         data = event.mimeData()
         module = bytes(data.data('lgsip/x-modulename').data()).decode('utf-8')
