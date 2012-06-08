@@ -48,3 +48,8 @@ class Wire(QtGui.QGraphicsObject):
             dpen.setColor(Qt.red)
             painter.setPen(dpen)
             painter.drawLine(self.x, self.y, self.nx, self.ny)
+
+    def mousePressEvent(self, event):
+        super(Wire, self).mousePressEvent(event)
+        if event.button() == Qt.RightButton:
+            self.deleteLater()
