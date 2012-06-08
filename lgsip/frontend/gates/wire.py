@@ -20,18 +20,17 @@ from PyQt4.QtCore import QRectF, Qt
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, x=0, y=0, propagating=False, inGate=False):
+    def __init__(self, x=0, y=0, propagating=False):
         super(Wire, self).__init__()
         self.x, self.y = x, y
         self.nx, self.ny = x, y
         self.propagating = propagating
-        self.inGate = inGate
-
-    def setLine(self, x, y):
-        self.nx, self.ny = x, y
 
     def setStart(self, x, y):
         self.x, self.y = x, y
+
+    def setEnd(self, x, y):
+        self.nx, self.ny = x, y
 
     def boundingRect(self):
         return QRectF(self.x, self.y, self.x + self.nx, self.y + self.ny)

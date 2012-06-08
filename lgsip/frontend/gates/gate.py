@@ -83,20 +83,72 @@ class WireButton(_LgsipGateButton):
         self.setFixedSize(QSize(20, 4))
         self.path.addRect(0, 0, 20, 4)
         self.color = QtGui.QPalette().mid()
+        self._swires = list()
+        self._ewires = list()
+
+    def addStartWire(self, wire):
+        self._swires.append(wire)
+
+    def addEndWire(self, wire):
+        self._ewires.append(wire)
+
+    def cancelWire(self, wire):
+        self._swires.remove(wire)
+
+
+class InWireButton(WireButton):
+    def addStartWire(self, wire, pos):
+        super(InWireButton, self).addStartWire(wire)
+        pos += self.pos()
+        wire.setStart(pos.x(), pos.y() + 2)
+
+    def addEndWire(self, wire, pos):
+        super(InWireButton, self).addEndWire(wire)
+        pos += self.pos()
+        wire.setEnd(pos.x(), pos.y() + 2)
+
+    def moveWires(self, offset):
+        pos = offset + self.pos()
+        for wire in self._swires:
+            wire.setStart(pos.x(), pos.y() + 2)
+        for wire in self._ewires:
+            wire.setEnd(pos.x(), pos.y() + 2)
+
+
+class OutWireButton(WireButton):
+    def addStartWire(self, wire, pos):
+        super(OutWireButton, self).addStartWire(wire)
+        pos += self.pos()
+        wire.setStart(pos.x() + self.width(), pos.y() + 2)
+
+    def addEndWire(self, wire, pos):
+        super(OutWireButton, self).addEndWire(wire)
+        pos += self.pos()
+        wire.setEnd(pos.x() + self.width(), pos.y() + 2)
+
+    def moveWires(self, offset):
+        pos = offset + self.pos()
+        print(self.pos())
+        for wire in self._swires:
+            wire.setStart(pos.x() + self.width(), pos.y() + 2)
+        for wire in self._ewires:
+            wire.setEnd(pos.x() + self.width(), pos.y() + 2)
 
 
 class Gate(QtGui.QWidget):
-    wiring = pyqtSignal(int, int, int)
+    wiring = pyqtSignal(object, int)
 
     def __init__(self, inputs=1, outputs=1, parent=None):
         super(Gate, self).__init__(parent)
         self._sketched = False
         self._integrated = False
         self._wires = list()
+        self._wires2 = dict()
         self.setStyleSheet('background-color: transparent;')
         self.setFixedWidth(80)
         self.offset = QPoint()
-        self._buttons = set()
+        self._inbuttons = list()
+        self._outbuttons = list()
         self._inputs = inputs
         self._outputs = outputs
         self._drawWires()
@@ -113,26 +165,33 @@ class Gate(QtGui.QWidget):
         self.setFixedHeight(self.h)
         delta = self.h / (self._inputs + 1)
         for i in range(1, self._inputs + 1):
-            button = WireButton(self)
+            try:
+                button = self._inbuttons[i - 1]
+            except IndexError:
+                button = InWireButton(self)
+                button.clicked.connect(self._wiringIn)
+                self._inbuttons.append(button)
             button.move(0, delta * i - 2)
-            button.clicked.connect(self._wiringIn)
-            self._buttons.add(button)
             button.show()
         delta = self.h / (self._outputs + 1)
         for i in range(1, self._outputs + 1):
-            button = WireButton(self)
+            try:
+                button = self._outbuttons[i - 1]
+            except IndexError:
+                button = OutWireButton(self)
+                button.clicked.connect(self._wiringOut)
+                self._outbuttons.append(button)
             button.move(60, delta * i - 2)
-            button.clicked.connect(self._wiringOut)
-            self._buttons.add(button)
             button.show()
 
     def _drawButtons(self):
         delta = self.h / 2
-        self.delete = DeleteGateButton(self)
-        self._buttons.add(self.delete)
+        if not hasattr(self, "delete"):
+            self.delete = DeleteGateButton(self)
         if self._integrated:
             self.delete.move(20, delta - 16)
-            self.desintegrate = DesintegrateGateButton(self)
+            if not hasattr(self, "desintegrate"):
+                self.desintegrate = DesintegrateGateButton(self)
             self.desintegrate.move(20, delta - 4)
             self._buttons.add(self.desintegrate)
             self.desintegrate.show()
@@ -144,23 +203,21 @@ class Gate(QtGui.QWidget):
         self.path = QtGui.QPainterPath()
 
     def _wiringIn(self):
-        pos = self.sender().pos()
-        self.wiring.emit(0, pos.y() + 2, 0)
+        self.wiring.emit(self.sender(), 0)
 
     def _wiringOut(self):
-        pos = self.sender().pos()
-        self.wiring.emit(80, pos.y() + 2, 1)
+        self.wiring.emit(self.sender(), 1)
 
     def setSketched(self, val):
         self._sketched = val
 
-    def appendWire(self, wire, inOut, pos):
-        self._wires.append((wire, inOut, pos))
-
-    def removeWire(self, wire, inOut):
-        for wire, inOut, pos in self._wires:
-            if wire == wire and inOut == inOut:
-                self._wires.remove((wire, inOut, pos))
+    def moveWires(self, pos=None):
+        if not pos:
+            pos = self.pos()
+        for button in self._inbuttons:
+            button.moveWires(pos)
+        for button in self._outbuttons:
+            button.moveWires(pos)
 
     def paintEvent(self, event):
         super(Gate, self).paintEvent(event)
@@ -178,11 +235,7 @@ class Gate(QtGui.QWidget):
         if self._sketched:
             newPos = self.mapToParent(event.pos() - self.offset)
             self.move(newPos)
-            for wire, inOut, (x, y) in self._wires:
-                if inOut:
-                    wire.setLine(x + newPos.x(), y + newPos.y())
-                else:
-                    wire.setStart(x + newPos.x(), y + newPos.y())
+            self.moveWires(newPos)
 
     def mouseReleaseEvent(self, event):
         self.offset = QPoint()
@@ -200,33 +253,28 @@ class BasicGate(Gate):
         self._drawWireButtons()
 
     def _drawWireButtons(self):
-        self.addWire = AddWireButton(self)
+        if not hasattr(self, "addWire"):
+            self.addWire = AddWireButton(self)
         self.addWire.clicked.connect(self._addWire)
         self.addWire.move(20, self.h - 16)
-        self._buttons.add(self.addWire)
-        self.addWire.show()
 
     def _addWire(self):
         self._inputs += 1
-        while self._buttons:
-            button = self._buttons.pop()
-            button.deleteLater()
         self._drawWires()
         self._drawButtons()
         self._drawPath()
         self._drawWireButtons()
+        self.moveWires()
         self.update()
 
     def _removeWire(self):
         if self._inputs > 2:
             self._inputs -= 1
-            while self._buttons:
-                button = self._buttons.pop()
-                button.deleteLater()
             self._drawWires()
             self._drawButtons()
             self._drawPath()
             self._drawWireButtons()
+            self.moveWires()
             self.update()
 
 

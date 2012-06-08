@@ -27,9 +27,6 @@ class _LgsipScene(QtGui.QGraphicsScene):
         self._direction = None
         self._sender = None
 
-    def dragEnterEvent(self, event):
-        print(1)
-
     def dropEvent(self, event):
         data = event.mimeData()
         module = bytes(data.data('lgsip/x-modulename').data()).decode('utf-8')
@@ -40,25 +37,21 @@ class _LgsipScene(QtGui.QGraphicsScene):
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
 
-    def wire(self, x, y, direction):
+    def wire(self, realSender, direction):
         if self._wire and self._direction != direction:
-            pos = self.sender().pos()
-            self._wire.setLine(pos.x() + x, pos.y() + y)
-            self.sender().appendWire(self._wire, 1, (x, y))
+            realSender.addEndWire(self._wire, self.sender().pos())
             self._wire = None
             self._sender = None
         elif not self._wire:
-            self._direction = direction
-            self._sender = self.sender()
-            pos = self._sender.pos()
-            self._wire = Wire(pos.x() + x, pos.y() + y)
-            self._sender.appendWire(self._wire, 0, (x, y))
+            self._sender = realSender
+            self._wire = Wire()
+            self._sender.addStartWire(self._wire, self.sender().pos())
             self.addItem(self._wire)
 
     def mousePressEvent(self, event):
         if self._wire and event.button() == Qt.RightButton:
             self.removeItem(self._wire)
-            self._sender.removeWire(self._wire, 0)
+            self._sender.cancelWire(self._wire)
             self._wire = None
             self._sender = None
         super(_LgsipScene, self).mousePressEvent(event)
@@ -66,7 +59,7 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def mouseMoveEvent(self, event):
         if self._wire:
             pos = event.scenePos()
-            self._wire.setLine(pos.x(), pos.y())
+            self._wire.setEnd(pos.x(), pos.y())
             self.update()
         super(_LgsipScene, self).mouseMoveEvent(event)
 
