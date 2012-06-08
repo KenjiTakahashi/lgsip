@@ -95,6 +95,12 @@ class WireButton(_LgsipGateButton):
     def cancelWire(self, wire):
         self._swires.remove(wire)
 
+    def deleteWires(self):
+        for wire in self._swires:
+            wire.deleteLater()
+        for wire in self._ewires:
+            wire.deleteLater()
+
 
 class InWireButton(WireButton):
     def addStartWire(self, wire, pos):
@@ -128,7 +134,6 @@ class OutWireButton(WireButton):
 
     def moveWires(self, offset):
         pos = offset + self.pos()
-        print(self.pos())
         for wire in self._swires:
             wire.setStart(pos.x() + self.width(), pos.y() + 2)
         for wire in self._ewires:
@@ -188,6 +193,7 @@ class Gate(QtGui.QWidget):
         delta = self.h / 2
         if not hasattr(self, "delete"):
             self.delete = DeleteGateButton(self)
+            self.delete.clicked.connect(self._delete)
         if self._integrated:
             self.delete.move(20, delta - 16)
             if not hasattr(self, "desintegrate"):
@@ -207,6 +213,13 @@ class Gate(QtGui.QWidget):
 
     def _wiringOut(self):
         self.wiring.emit(self.sender(), 1)
+
+    def _delete(self):
+        for button in self._inbuttons:
+            button.deleteWires()
+        for button in self._outbuttons:
+            button.deleteWires()
+        self.deleteLater()
 
     def setSketched(self, val):
         self._sketched = val
