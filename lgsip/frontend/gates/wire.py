@@ -20,11 +20,10 @@ from PyQt4.QtCore import QRectF, Qt
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, x=0, y=0, propagating=False):
-        super(Wire, self).__init__()
-        self.x, self.y = x, y
-        self.nx, self.ny = x, y
-        self.propagating = propagating
+    def __init__(self, parent=None):
+        super(Wire, self).__init__(parent)
+        self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
+        self.propagating = False
 
     def setStart(self, x, y):
         self.x, self.y = x, y
@@ -50,6 +49,7 @@ class Wire(QtGui.QGraphicsObject):
             painter.drawLine(self.x, self.y, self.nx, self.ny)
 
     def mousePressEvent(self, event):
+        # FIXME: it collides rect instead of lines
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
             self.deleteLater()

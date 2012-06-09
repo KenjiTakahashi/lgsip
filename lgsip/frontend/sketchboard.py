@@ -16,8 +16,44 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt
+from PyQt4.QtCore import Qt, QRectF
 from lgsip.frontend.gates.wire import Wire
+from lgsip.frontend.gates.gate import DeleteGateButton
+
+
+class _RubberBand(QtGui.QGraphicsObject):
+    def __init__(self, parent=None):
+        super(_RubberBand, self).__init__(parent)
+        self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
+        self.setZValue(-1)
+        self._delete = DeleteGateButton()
+        proxy = QtGui.QGraphicsProxyWidget(self)
+        proxy.setWidget(self._delete)
+        #self._delete.show()
+
+    def setStart(self, pos):
+        self.x, self.y = pos.x(), pos.y()
+
+    def setEnd(self, pos):
+        self.nx, self.ny = pos.x(), pos.y()
+        if self.ny < self.y:
+            y = self.ny + 4
+        else:
+            y = self.ny - 20
+        if self.nx < self.x:
+            x = self.nx + 4
+        else:
+            x = self.nx - 20
+        self._delete.move(x, y)
+
+    def boundingRect(self):
+        return QRectF(self.x, self.y, self.nx - self.x, self.ny - self.y)
+
+    def paint(self, painter, option, widget):
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QtGui.QPalette().light())
+        width, height = self.nx - self.x, self.ny - self.y
+        painter.drawRect(self.x, self.y, width, height)
 
 
 class _LgsipScene(QtGui.QGraphicsScene):
@@ -26,6 +62,8 @@ class _LgsipScene(QtGui.QGraphicsScene):
         self._wire = None
         self._direction = None
         self._sender = None
+        self._rubber = _RubberBand()
+        self._rubber_ = False
 
     def dropEvent(self, event):
         data = event.mimeData()
@@ -49,18 +87,33 @@ class _LgsipScene(QtGui.QGraphicsScene):
             self.addItem(self._wire)
 
     def mousePressEvent(self, event):
-        if self._wire and event.button() == Qt.RightButton:
-            self.removeItem(self._wire)
-            self._sender.cancelWire(self._wire)
-            self._wire = None
-            self._sender = None
+        button = event.button()
+        if button == Qt.RightButton:
+            if self._wire:
+                self.removeItem(self._wire)
+                self._sender.cancelWire(self._wire)
+                self._wire = None
+                self._sender = None
+            elif self._rubber_:
+                self.removeItem(self._rubber)
+        elif button == Qt.LeftButton:
+            if not self._rubber_ and not self.itemAt(event.scenePos()):
+                self.removeItem(self._rubber)
+                self._rubber_ = True
+                self._rubber.setStart(event.scenePos())
+                self._rubber.setEnd(event.scenePos())
+                self.addItem(self._rubber)
+            elif self._rubber_:
+                self._rubber_ = False
         super(_LgsipScene, self).mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
         if self._wire:
             pos = event.scenePos()
             self._wire.setEnd(pos.x(), pos.y())
-            self.update()
+        elif self._rubber_:
+            self._rubber.setEnd(event.scenePos())
+        self.update()
         super(_LgsipScene, self).mouseMoveEvent(event)
 
 
