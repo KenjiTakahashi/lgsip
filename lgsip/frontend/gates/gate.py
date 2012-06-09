@@ -193,7 +193,7 @@ class Gate(QtGui.QWidget):
         delta = self.h / 2
         if not hasattr(self, "delete"):
             self.delete = DeleteGateButton(self)
-            self.delete.clicked.connect(self._delete)
+            self.delete.clicked.connect(self.deleteLater)
         if self._integrated:
             self.delete.move(20, delta - 16)
             if not hasattr(self, "desintegrate"):
@@ -214,12 +214,12 @@ class Gate(QtGui.QWidget):
     def _wiringOut(self):
         self.wiring.emit(self.sender(), 1)
 
-    def _delete(self):
+    def deleteLater(self):
         for button in self._inbuttons:
             button.deleteWires()
         for button in self._outbuttons:
             button.deleteWires()
-        self.deleteLater()
+        super(Gate, self).deleteLater()
 
     def setSketched(self, val):
         self._sketched = val

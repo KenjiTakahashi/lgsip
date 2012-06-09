@@ -18,7 +18,7 @@
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, QRectF
 from lgsip.frontend.gates.wire import Wire
-from lgsip.frontend.gates.gate import DeleteGateButton
+from lgsip.frontend.gates.gate import DeleteGateButton, Gate
 
 
 class _RubberBand(QtGui.QGraphicsObject):
@@ -27,9 +27,9 @@ class _RubberBand(QtGui.QGraphicsObject):
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
         self.setZValue(-1)
         self._delete = DeleteGateButton()
+        self._delete.clicked.connect(self._deleteGates)
         proxy = QtGui.QGraphicsProxyWidget(self)
         proxy.setWidget(self._delete)
-        #self._delete.show()
 
     def setStart(self, pos):
         self.x, self.y = pos.x(), pos.y()
@@ -45,6 +45,12 @@ class _RubberBand(QtGui.QGraphicsObject):
         else:
             x = self.nx - 20
         self._delete.move(x, y)
+
+    def _deleteGates(self):
+        scene = self.scene()
+        for gate in scene.collidingItems(self):
+            gate.deleteLater()
+        scene.removeItem(self)
 
     def boundingRect(self):
         return QRectF(self.x, self.y, self.nx - self.x, self.ny - self.y)
