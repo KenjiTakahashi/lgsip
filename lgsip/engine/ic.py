@@ -15,10 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lgsip.frontend.gates.gate import Gate
 
+class IC(object):
+    def __init__(self):
+        self._inputs = list()
+        self._outputs = list()
+        self._gates = list()
 
-class _ComplexGate(Gate):
-    def _drawPath(self):
-        super(_ComplexGate, self)._drawPath()
-        self.path.addRect(20, 0, 40, self.h)
+    def addWire(self, output, gate, input):
+        self._outputs[output].addWire(gate, input)
+
+    def wire(self, index):
+        return self._inputs[index]

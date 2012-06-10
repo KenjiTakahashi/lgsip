@@ -18,7 +18,7 @@
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, QRectF
 from lgsip.frontend.gates.wire import Wire
-from lgsip.frontend.gates.gate import DeleteGateButton, Gate
+from lgsip.frontend.gates.gate import DeleteGateButton
 
 
 class _RubberBand(QtGui.QGraphicsObject):
