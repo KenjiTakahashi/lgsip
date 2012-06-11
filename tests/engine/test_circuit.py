@@ -187,3 +187,58 @@ class TestJKLatch(GateTest):
         self.a2.wait()
         self.n1.wait()
         self.n2.wait()
+
+
+from lgsip.engine.ic import IC
+
+
+class TestIC(GateTest):
+    def _prepare(self, i1, i2, i3):
+        self.i1 = io.BinaryInput(i1)
+        self.i2 = io.BinaryInput(i2)
+        self.i3 = io.BinaryInput(i3)
+        self.a1 = basic.And(2)
+        self.a2 = basic.And(2)
+        self.o = basic.Or(2)
+        self.n = basic.Not()
+        self.i1.valueChanged.connect(self._increment)
+        self.i2.valueChanged.connect(self._increment)
+        self.i3.valueChanged.connect(self._increment)
+        self.a1.valueChanged.connect(self._increment)
+        self.a2.valueChanged.connect(self._increment)
+        self.o.valueChanged.connect(self._increment)
+        self.n.valueChanged.connect(self._increment)
+        self.i1.addWire(self.a1, 0)
+        self.i2.addWire(self.n, 0)
+        self.n.addWire(self.a1, 1)
+        self.i2.addWire(self.a2, 0)
+        self.i3.addWire(self.a2, 1)
+        self.a1.addWire(self.o, 0)
+        self.a2.addWire(self.o, 1)
+
+    def test_IC(self):
+        self._prepare(False, False, False)
+        self.out = io.BinaryOutput()
+        self.o.addWire(self.out, 0)
+        ic = IC(
+            self.i1, self.i2, self.i3, self.a1, self.a2, self.o, self.n, self.o
+        )
+        assert False
+
+    def tearDown(self):
+        self.i1.die()
+        self.i2.die()
+        self.i3.die()
+        self.a1.die()
+        self.a2.die()
+        self.o.die()
+        self.n.die()
+        self.out.die()
+        self.i1.wait()
+        self.i2.wait()
+        self.i3.wait()
+        self.a1.wait()
+        self.a2.wait()
+        self.o.wait()
+        self.n.wait()
+        self.out.wait()

@@ -15,12 +15,32 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from lgsip.engine.gates.io import BinaryInput, BinaryOutput
+
 
 class IC(object):
-    def __init__(self):
-        self._inputs = list()
-        self._outputs = list()
+    def __init__(self, *gates):
+        self._inputs = dict()
+        self._outputs = dict()
         self._gates = list()
+        for gate in gates:
+            if isinstance(gate, BinaryInput):
+                self._inputs.setdefault(
+                    gate, list()
+                ).extend(gate.connections())
+                # gate.deleteLater()
+            elif isinstance(gate, BinaryOutput):
+                self._outputs.setdefault(gate, list())
+            else:
+                for gate_, num in gate.connections():
+                    if isinstance(gate_, BinaryOutput):
+                        self._outputs.setdefault(
+                            gate_, list()
+                        ).append((gate, 0))
+                        gate.removeWire(gate_, num)
+                    else:
+                        self._gates.append(gate)
+        print(self._inputs, 0, self._gates, 1, self._outputs)
 
     def addWire(self, output, gate, input):
         self._outputs[output].addWire(gate, input)

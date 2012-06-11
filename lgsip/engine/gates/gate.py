@@ -42,6 +42,12 @@ class _Gate(QThread):
     def addWire(self, gate, index):
         self._gates.append((gate, index))
 
+    def removeWire(self, gate, index):
+        self._gates.remove((gate, index))
+
+    def connections(self):
+        return self._gates
+
     def changeInput(self, index, value):
         try:
             if self._inputs[index] != value:
