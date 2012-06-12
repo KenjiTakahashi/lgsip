@@ -100,7 +100,7 @@ class _LgsipScene(QtGui.QGraphicsScene):
                 self._sender.cancelWire(self._wire)
                 self._wire = None
                 self._sender = None
-            elif self._rubber_:
+            elif self._rubber:
                 self.removeItem(self._rubber)
         elif button == Qt.LeftButton:
             if not self._rubber_ and not self.itemAt(event.scenePos()):
