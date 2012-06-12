@@ -40,7 +40,15 @@ class Wire(QtGui.QGraphicsObject):
         pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
         painter.setPen(pen)
         self.path = QtGui.QPainterPath()
+        dx = (self.nx - self.x) / 2
+        dy = (self.ny - self.y) / 2
         self.path.moveTo(self.x, self.y)
+        if dx and dy:
+            dx += self.x
+            self.path.lineTo(dx, self.y)
+            self.path.moveTo(dx, self.y)
+            self.path.lineTo(dx, self.ny)
+            self.path.moveTo(dx, self.ny)
         self.path.lineTo(self.nx, self.ny)
         painter.drawPath(self.path)
         if self.propagating:
