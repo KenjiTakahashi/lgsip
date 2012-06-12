@@ -39,7 +39,10 @@ class Wire(QtGui.QGraphicsObject):
         pen.setWidth(4)
         pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
         painter.setPen(pen)
-        painter.drawLine(self.x, self.y, self.nx, self.ny)
+        self.path = QtGui.QPainterPath()
+        self.path.moveTo(self.x, self.y)
+        self.path.lineTo(self.nx, self.ny)
+        painter.drawPath(self.path)
         if self.propagating:
             dpen = QtGui.QPen()
             dpen.setWidth(4)
@@ -48,8 +51,13 @@ class Wire(QtGui.QGraphicsObject):
             painter.setPen(dpen)
             painter.drawLine(self.x, self.y, self.nx, self.ny)
 
+    def shape(self):
+        try:
+            return self.path
+        except AttributeError:
+            return super(Wire, self).shape()
+
     def mousePressEvent(self, event):
-        # FIXME: it collides rect instead of lines
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
             self.deleteLater()
