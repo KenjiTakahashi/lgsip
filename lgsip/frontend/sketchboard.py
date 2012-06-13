@@ -17,8 +17,59 @@
 
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, QRectF
-from lgsip.frontend.gates.wire import Wire
 from lgsip.frontend.gates.gate import DeleteGateButton
+
+
+class Wire(QtGui.QGraphicsObject):
+    def __init__(self, parent=None):
+        super(Wire, self).__init__(parent)
+        self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
+        self.propagating = False
+
+    def setStart(self, x, y):
+        self.x, self.y = x, y
+
+    def setEnd(self, x, y):
+        self.nx, self.ny = x, y
+
+    def boundingRect(self):
+        return QRectF(self.x, self.y, self.x + self.nx, self.y + self.ny)
+
+    def paint(self, painter, option, widget):
+        pen = QtGui.QPen()
+        pen.setWidth(4)
+        pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
+        painter.setPen(pen)
+        self.path = QtGui.QPainterPath()
+        dx = (self.nx - self.x) / 2
+        dy = (self.ny - self.y) / 2
+        self.path.moveTo(self.x, self.y)
+        if dx and dy:
+            dx += self.x
+            self.path.lineTo(dx, self.y)
+            self.path.moveTo(dx, self.y)
+            self.path.lineTo(dx, self.ny)
+            self.path.moveTo(dx, self.ny)
+        self.path.lineTo(self.nx, self.ny)
+        painter.drawPath(self.path)
+        if self.propagating:
+            dpen = QtGui.QPen()
+            dpen.setWidth(4)
+            dpen.setDashPattern([3, 4])
+            dpen.setColor(Qt.red)
+            painter.setPen(dpen)
+            painter.drawLine(self.x, self.y, self.nx, self.ny)
+
+    def shape(self):
+        try:
+            return self.path
+        except AttributeError:
+            return super(Wire, self).shape()
+
+    def mousePressEvent(self, event):
+        super(Wire, self).mousePressEvent(event)
+        if event.button() == Qt.RightButton:
+            self.deleteLater()
 
 
 class _RubberBand(QtGui.QGraphicsObject):
