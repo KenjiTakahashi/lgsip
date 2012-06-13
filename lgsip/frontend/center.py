@@ -80,6 +80,20 @@ class AddPushButton(_LgsipPushButton):
 class ClosePushButton(_LgsipPushButton):
     def __init__(self, parent=None):
         super(ClosePushButton, self).__init__(parent)
+        self.path.addRoundedRect(7, 10, 10, 4, 20, 60, Qt.RelativeSize)
+        self.path.addRoundedRect(10, 7, 4, 10, 60, 20, Qt.RelativeSize)
+
+    def paintEvent(self, event):
+        super(_LgsipPushButton, self).paintEvent(event)
+        painter = QtGui.QPainter(self)
+        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QtGui.QPalette().mid())
+        transform = QtGui.QTransform()
+        transform.translate(12, -5)
+        transform.rotate(45)
+        painter.setTransform(transform)
+        painter.drawPath(self.path)
 
 
 class _LgsipTabBarButtons(QtGui.QWidget):
