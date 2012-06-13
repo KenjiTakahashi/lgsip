@@ -62,3 +62,12 @@ class BinaryOutput(OutputGate):
         if not value:
             value = not self._switch.isChecked()
         self._switch.setChecked(value)
+
+
+class Clock(InputGate):
+    def __init__(self, parent=None):
+        super(Clock, self).__init__(parent=parent)
+        self.path.addRect(20, 0, 40, self.h)
+        self.time = QtGui.QLineEdit(self)
+        self.time.setFixedSize(18, 18)
+        self.time.move(38, 3)
