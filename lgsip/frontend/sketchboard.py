@@ -23,8 +23,10 @@ from lgsip.frontend.gates.gate import DeleteGateButton
 class Wire(QtGui.QGraphicsObject):
     def __init__(self, parent=None):
         super(Wire, self).__init__(parent)
+        self.setZValue(-1)
+        self.setFlag(self.ItemIsSelectable, True)
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
-        self.propagating = False
+        self.propagating = True
 
     def setStart(self, x, y):
         self.x, self.y = x, y
@@ -40,43 +42,46 @@ class Wire(QtGui.QGraphicsObject):
         pen.setWidth(4)
         pen.setColor(QtGui.QColor(QtGui.QPalette().mid()))
         painter.setPen(pen)
-        self.path = QtGui.QPainterPath()
         dx = (self.nx - self.x) / 2
         dy = (self.ny - self.y) / 2
+        self.path = QtGui.QPainterPath()
+        self.shape = QtGui.QPainterPath()
         self.path.moveTo(self.x, self.y)
         if dx and dy:
             dx += self.x
             self.path.lineTo(dx, self.y)
+            self.shape.addRect(self.x, self.y - 2, dx - self.x, 4)
             self.path.moveTo(dx, self.y)
             self.path.lineTo(dx, self.ny)
+            self.shape.addRect(dx - 2, self.y - 2, 4, self.ny - self.y)
             self.path.moveTo(dx, self.ny)
         self.path.lineTo(self.nx, self.ny)
+        self.shape.addRect(dx - 2, self.ny - 2, self.nx - dx, 4)
         painter.drawPath(self.path)
         if self.propagating:
-            dpen = QtGui.QPen()
-            dpen.setWidth(4)
-            dpen.setDashPattern([3, 4])
-            dpen.setColor(Qt.red)
-            painter.setPen(dpen)
-            painter.drawLine(self.x, self.y, self.nx, self.ny)
+            pen.setDashPattern([3, 4])
+            pen.setColor(Qt.red)
+            painter.setPen(pen)
+            painter.drawPath(self.path)
 
     def shape(self):
-        try:
-            return self.path
-        except AttributeError:
-            return super(Wire, self).shape()
+        return self.shape
 
     def mousePressEvent(self, event):
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
             self.deleteLater()
 
+    def mouseMoveEvent(self, event):
+        super(Wire, self).mouseMoveEvent(event)
+        print(event.pos())
+
 
 class _RubberBand(QtGui.QGraphicsObject):
     def __init__(self, parent=None):
         super(_RubberBand, self).__init__(parent)
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
-        self.setZValue(-1)
+        self.setZValue(-2)
         self._delete = DeleteGateButton()
         self._delete.clicked.connect(self._deleteGates)
         proxy = QtGui.QGraphicsProxyWidget(self)
