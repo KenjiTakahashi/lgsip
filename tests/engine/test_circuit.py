@@ -216,13 +216,18 @@ class TestIC(GateTest):
         self.a1.addWire(self.o, 0)
         self.a2.addWire(self.o, 1)
 
-    def test_IC(self):
+    def test_integration(self):
         self._prepare(False, False, False)
         self.out = io.BinaryOutput()
         self.o.addWire(self.out, 0)
         ic = IC(
             self.i1, self.i2, self.i3, self.a1, self.a2, self.o, self.n, self.o
         )
+        assert(ic._inputs == [
+            [(self.a1, 0)], [(self.n, 0), (self.a2, 0)], [(self.a2, 1)]
+        ])
+        assert(ic._outputs == [[(self.o, 0)]])
+        assert(ic._gates == [self.a1, self.a2, self.o, self.n])
         assert False
 
     def tearDown(self):
