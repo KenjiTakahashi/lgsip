@@ -287,6 +287,9 @@ class BasicGate(Gate):
     def __init__(self, inputs=2, outputs=1, parent=None):
         super(BasicGate, self).__init__(inputs, outputs, parent)
         if self._wireButtons():
+            self.removeWire = RemoveWireButton(self)
+            self.removeWire.clicked.connect(self._removeWire)
+            self.removeWire.move(20, -2)
             self._drawWireButtons()
         self._doGate(inputs)
 
@@ -297,9 +300,6 @@ class BasicGate(Gate):
         raise NotImplementedError
 
     def _drawWireButtons(self):
-        self.removeWire = RemoveWireButton(self)
-        self.removeWire.clicked.connect(self._removeWire)
-        self.removeWire.move(20, -2)
         if not hasattr(self, "addWire"):
             self.addWire = AddWireButton(self)
         self.addWire.clicked.connect(self._addWire)
