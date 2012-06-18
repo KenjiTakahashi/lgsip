@@ -16,17 +16,24 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.frontend.gates import basic
+from lgsip.engine.gates import compound
 from PyQt4.QtCore import QPointF
 from PyQt4 import QtGui
 
 
 class Nand(basic.And):
+    def _doGate(self, inputs):
+        self._gate = compound.Nand(inputs)
+
     def _drawPath(self):
         super(Nand, self)._drawPath()
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
 
 
 class Nor(basic.Or):
+    def _doGate(self, inputs):
+        self._gate = compound.Nor(inputs)
+
     def _drawPath(self):
         super(Nor, self)._drawPath()
         self.path.addEllipse(60, self.h / 2 - 5, 10, 10)
@@ -35,6 +42,9 @@ class Nor(basic.Or):
 class Xor(basic.Or):
     def __init__(self, parent=None):
         super(Xor, self).__init__(2, parent=parent)
+
+    def _doGate(self, _):
+        self._gate = compound.Xor()
 
     def _drawPath(self):
         super(Xor, self)._drawPath()
@@ -53,6 +63,9 @@ class Xor(basic.Or):
 class Xnor(Xor):
     def __init__(self, parent=None):
         super(Xnor, self).__init__(parent)
+
+    def _doGate(self, _):
+        self._gate = compound.Xnor()
 
     def _drawPath(self):
         super(Xnor, self)._drawPath()

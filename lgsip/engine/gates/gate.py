@@ -35,7 +35,7 @@ class _Gate(QThread):
         while self._running:
             self.msleep(1)
             value = self.compute()
-            if value != self._value:  # TODO: Test if we could for inside if
+            if value != self._value:
                 self.outValueChanged.emit(value)
                 self._value = value
             for (gate, index) in self._gates:

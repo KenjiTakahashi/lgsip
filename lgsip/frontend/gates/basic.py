@@ -24,9 +24,11 @@ from PyQt4.QtCore import QPointF
 class And(BasicGate):
     def __init__(self, inputs=2, parent=None):
         super(And, self).__init__(inputs, 1, parent)
-        self._gate = basic.And(inputs)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
+
+    def _doGate(self, inputs):
+        self._gate = basic.And(inputs)
 
     def _drawPath(self):
         super(And, self)._drawPath()
@@ -36,6 +38,14 @@ class And(BasicGate):
 
 
 class Or(BasicGate):
+    def __init__(self, inputs=2, parent=None):
+        super(Or, self). __init__(inputs, 1, parent)
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
+
+    def _doGate(self, inputs):
+        self._gate = basic.Or(inputs)
+
     def _drawPath(self):
         super(Or, self)._drawPath()
         self.path.moveTo(15, 0)
@@ -46,6 +56,14 @@ class Or(BasicGate):
 
 
 class Not(BasicGate):
+    def __init__(self, parent=None):
+        super(Not, self). __init__(0, 1, parent)
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
+
+    def _doGate(self, _):
+        self._gate = basic.Not()
+
     def _drawPath(self):
         super(Not, self)._drawPath()
         self.path.addPolygon(QtGui.QPolygonF([

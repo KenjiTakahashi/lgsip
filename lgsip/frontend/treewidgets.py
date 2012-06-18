@@ -83,11 +83,8 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
                     subitem.setData(0, 666, pixmap)
                     subitem.setData(0, 667, gate)
                     subitem.setData(0, 668, module)
-                    try:
-                        widget._gate.die()  # FIXME
-                        widget._gate.wait()
-                    except AttributeError:
-                        pass
+                    widget._gate.die()
+                    widget._gate.wait()
         self.expandAll()
 
     def _expandCollapse(self, item):

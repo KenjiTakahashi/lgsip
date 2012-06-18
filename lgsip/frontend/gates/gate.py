@@ -284,6 +284,10 @@ class BasicGate(Gate):
         self.removeWire.clicked.connect(self._removeWire)
         self.removeWire.move(20, -2)
         self._drawWireButtons()
+        self._doGate(inputs)
+
+    def _doGate(self, inputs):
+        raise NotImplementedError
 
     def _drawWireButtons(self):
         if not hasattr(self, "addWire"):
