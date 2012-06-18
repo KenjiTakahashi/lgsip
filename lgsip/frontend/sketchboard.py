@@ -21,18 +21,23 @@ from lgsip.frontend.gates.gate import DeleteGateButton
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, propagating=False, parent=None):
+    def __init__(self, propagating=False, realParent=None, parent=None):
         super(Wire, self).__init__(parent)
         self.setZValue(-1)
         self.setFlag(self.ItemIsSelectable, True)
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
         self._propagating = propagating
+        self._startParent = realParent
+        self._endParent = None
 
     def setStart(self, x, y):
         self.x, self.y = x, y
 
     def setEnd(self, x, y):
         self.nx, self.ny = x, y
+
+    def setEndParent(self, parent):
+        self._endParent = parent
 
     def setPropagating(self, value):
         self._propagating = value
@@ -73,6 +78,8 @@ class Wire(QtGui.QGraphicsObject):
     def mousePressEvent(self, event):
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
+            if self._endParent:
+                self._startParent.disconnect(self._endParent)
             self.deleteLater()
 
     def mouseMoveEvent(self, event):
@@ -145,11 +152,12 @@ class _LgsipScene(QtGui.QGraphicsScene):
             realSender.addEndWire(
                 self._wire, self.sender().pos(), self._sender.parent()
             )
+            self._wire.setEndParent(realSender)
             self._wire = None
             self._sender = None
         elif not self._wire:
             self._sender = realSender
-            self._wire = Wire(self._sender.propagating)
+            self._wire = Wire(self._sender.propagating, self.sender())
             self._sender.addStartWire(self._wire, self.sender().pos())
             self.addItem(self._wire)
 

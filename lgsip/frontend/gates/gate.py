@@ -244,6 +244,10 @@ class Gate(QtGui.QWidget):
     def connect(self, wire, gate):
         gate._gate.addWire(self._gate, self._inbuttons.index(wire))
 
+    def disconnect(self, wire):
+        gate = wire.parent()
+        self._gate.removeWire(gate._gate, gate._inbuttons.index(wire))
+
     def moveWires(self, pos=None):
         if not pos:
             pos = self.pos()
