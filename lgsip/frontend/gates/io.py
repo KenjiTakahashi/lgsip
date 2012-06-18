@@ -63,6 +63,8 @@ class BinaryOutput(OutputGate):
         self._switch = _SwitchButton(self)
         self._switch.setEnabled(False)
         self._gate = io.BinaryOutput()
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.inValueChanged.connect(self.switch)
 
     def switch(self, value=None):
         if not value:
@@ -78,3 +80,5 @@ class Clock(InputGate):
         self.time.setFixedSize(18, 18)
         self.time.move(38, 3)
         self._gate = io.Clock()
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
