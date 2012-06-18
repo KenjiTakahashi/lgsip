@@ -30,6 +30,9 @@ class And(BasicGate):
     def _doGate(self, inputs):
         self._gate = basic.And(inputs)
 
+    def _wireButtons(self):
+        return True
+
     def _drawPath(self):
         super(And, self)._drawPath()
         self.path.moveTo(40, self.h / 2)
@@ -45,6 +48,9 @@ class Or(BasicGate):
 
     def _doGate(self, inputs):
         self._gate = basic.Or(inputs)
+
+    def _wireButtons(self):
+        return True
 
     def _drawPath(self):
         super(Or, self)._drawPath()
@@ -63,6 +69,9 @@ class Not(BasicGate):
 
     def _doGate(self, _):
         self._gate = basic.Not()
+
+    def _wireButtons(self):
+        return False
 
     def _drawPath(self):
         super(Not, self)._drawPath()

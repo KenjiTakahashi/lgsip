@@ -46,6 +46,9 @@ class Xor(basic.Or):
     def _doGate(self, _):
         self._gate = compound.Xor()
 
+    def _wireButtons(self):
+        return False
+
     def _drawPath(self):
         super(Xor, self)._drawPath()
         self.path2 = QtGui.QPainterPath()
@@ -66,6 +69,9 @@ class Xnor(Xor):
 
     def _doGate(self, _):
         self._gate = compound.Xnor()
+
+    def _wireButtons(self):
+        return False
 
     def _drawPath(self):
         super(Xnor, self)._drawPath()
