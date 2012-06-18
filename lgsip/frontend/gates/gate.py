@@ -85,15 +85,27 @@ class WireButton(_LgsipGateButton):
         self.color = QtGui.QPalette().mid()
         self._swires = list()
         self._ewires = list()
+        self.propagating = False
 
     def addStartWire(self, wire):
         self._swires.append(wire)
 
-    def addEndWire(self, wire):
+    def addEndWire(self, wire, gate):
         self._ewires.append(wire)
+        self.parent().connect(self, gate)
 
     def cancelWire(self, wire):
         self._swires.remove(wire)
+
+    def setPropagating(self, value):
+        self.propagating = value
+        if value:
+            self.color = Qt.red
+        else:
+            self.color = QtGui.QPalette().mid()
+        for wire in self._ewires:
+            wire.setPropagating(value)
+        self.update()
 
     def deleteWires(self):
         for wire in self._swires:
@@ -108,8 +120,8 @@ class InWireButton(WireButton):
         pos += self.pos()
         wire.setStart(pos.x(), pos.y() + 2)
 
-    def addEndWire(self, wire, pos):
-        super(InWireButton, self).addEndWire(wire)
+    def addEndWire(self, wire, pos, gate):
+        super(InWireButton, self).addEndWire(wire, gate)
         pos += self.pos()
         wire.setEnd(pos.x(), pos.y() + 2)
 
@@ -127,8 +139,8 @@ class OutWireButton(WireButton):
         pos += self.pos()
         wire.setStart(pos.x() + self.width(), pos.y() + 2)
 
-    def addEndWire(self, wire, pos):
-        super(OutWireButton, self).addEndWire(wire)
+    def addEndWire(self, wire, pos, gate):
+        super(OutWireButton, self).addEndWire(wire, gate)
         pos += self.pos()
         wire.setEnd(pos.x() + self.width(), pos.y() + 2)
 
@@ -147,8 +159,6 @@ class Gate(QtGui.QWidget):
         super(Gate, self).__init__(parent)
         self._sketched = False
         self._integrated = False
-        self._wires = list()
-        self._wires2 = dict()
         self.setStyleSheet('background-color: transparent;')
         self.setFixedWidth(80)
         self.offset = QPoint()
@@ -223,6 +233,16 @@ class Gate(QtGui.QWidget):
 
     def setSketched(self, val):
         self._sketched = val
+
+    def setInPropagating(self, i, value):
+        self._inbuttons[i].setPropagating(value)
+
+    def setOutPropagating(self, value):
+        # FIXME
+        self._outbuttons[0].setPropagating(value)
+
+    def connect(self, wire, gate):
+        gate._gate.addWire(self._gate, self._inbuttons.index(wire))
 
     def moveWires(self, pos=None):
         if not pos:

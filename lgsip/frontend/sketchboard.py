@@ -21,18 +21,21 @@ from lgsip.frontend.gates.gate import DeleteGateButton
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, parent=None):
+    def __init__(self, propagating=False, parent=None):
         super(Wire, self).__init__(parent)
         self.setZValue(-1)
         self.setFlag(self.ItemIsSelectable, True)
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
-        self.propagating = True
+        self._propagating = propagating
 
     def setStart(self, x, y):
         self.x, self.y = x, y
 
     def setEnd(self, x, y):
         self.nx, self.ny = x, y
+
+    def setPropagating(self, value):
+        self._propagating = value
 
     def boundingRect(self):
         return QRectF(self.x, self.y, self.x + self.nx, self.y + self.ny)
@@ -58,7 +61,7 @@ class Wire(QtGui.QGraphicsObject):
         self.path.lineTo(self.nx, self.ny)
         self.shape.addRect(dx - 2, self.ny - 2, self.nx - dx, 4)
         painter.drawPath(self.path)
-        if self.propagating:
+        if self._propagating:
             pen.setDashPattern([3, 4])
             pen.setColor(Qt.red)
             painter.setPen(pen)
@@ -139,12 +142,14 @@ class _LgsipScene(QtGui.QGraphicsScene):
 
     def wire(self, realSender, direction):
         if self._wire and self._direction != direction:
-            realSender.addEndWire(self._wire, self.sender().pos())
+            realSender.addEndWire(
+                self._wire, self.sender().pos(), self._sender.parent()
+            )
             self._wire = None
             self._sender = None
         elif not self._wire:
             self._sender = realSender
-            self._wire = Wire()
+            self._wire = Wire(self._sender.propagating)
             self._sender.addStartWire(self._wire, self.sender().pos())
             self.addItem(self._wire)
 
@@ -159,7 +164,11 @@ class _LgsipScene(QtGui.QGraphicsScene):
             elif self._rubber:
                 self.removeItem(self._rubber)
         elif button == Qt.LeftButton:
-            if not self._rubber_ and not self.itemAt(event.scenePos()):
+            if(
+                not self._rubber_ and
+                not self.itemAt(event.scenePos()) and
+                not self._wire
+            ):
                 self.removeItem(self._rubber)
                 self._rubber_ = True
                 self._rubber.setStart(event.scenePos())

@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.frontend.gates.gate import InputGate, OutputGate
+from lgsip.engine.gates import io
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, pyqtSignal
 
@@ -46,9 +47,13 @@ class BinaryInput(InputGate):
         self.path.addRect(20, 0, 40, self.h)
         self._switch = _SwitchButton(self)
         self._switch.clicked.connect(self._switched)
+        self._gate = io.BinaryInput()
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
 
     def _switched(self):
         self.switched.emit(self._switch.isChecked())
+        self._gate.switch()
 
 
 class BinaryOutput(OutputGate):
@@ -57,6 +62,7 @@ class BinaryOutput(OutputGate):
         self.path.addRect(20, 0, 40, self.h)
         self._switch = _SwitchButton(self)
         self._switch.setEnabled(False)
+        self._gate = io.BinaryOutput()
 
     def switch(self, value=None):
         if not value:
@@ -71,3 +77,4 @@ class Clock(InputGate):
         self.time = QtGui.QLineEdit(self)
         self.time.setFixedSize(18, 18)
         self.time.move(38, 3)
+        self._gate = io.Clock()

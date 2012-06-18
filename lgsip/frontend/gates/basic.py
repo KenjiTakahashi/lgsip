@@ -16,11 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from lgsip.frontend.gates.gate import BasicGate
+from lgsip.engine.gates import basic
 from PyQt4 import QtGui
 from PyQt4.QtCore import QPointF
 
 
 class And(BasicGate):
+    def __init__(self, inputs=2, parent=None):
+        super(And, self).__init__(inputs, 1, parent)
+        self._gate = basic.And(inputs)
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
+
     def _drawPath(self):
         super(And, self)._drawPath()
         self.path.moveTo(40, self.h / 2)

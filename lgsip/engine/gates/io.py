@@ -20,12 +20,12 @@ from PyQt4.QtCore import QTimer
 
 
 class BinaryInput(IOGate):
-    def __init__(self, value):
+    def __init__(self, value=False):
         super(BinaryInput, self).__init__()
         self._inputs.append(value)
 
     def switch(self):
-        self.changeInput(0, not self._inputs[0])
+        self._inputs[0] = not self._inputs[0]
 
     def compute(self):
         return self._inputs[0]
@@ -41,7 +41,7 @@ class BinaryOutput(IOGate):
 
 
 class Clock(IOGate):
-    def __init__(self, timeout):
+    def __init__(self, timeout=1000):
         super(Clock, self).__init__()
         self._inputs.append(False)
         self._timer = QTimer()
@@ -51,7 +51,7 @@ class Clock(IOGate):
         self.start()
 
     def _timeout(self):
-        self.changeInput(0, not self._inputs[0])
+        self._inputs[0] = not self._inputs[0]
 
     def slower(self):
         self._timer.setInterval(self.interval() + 20)

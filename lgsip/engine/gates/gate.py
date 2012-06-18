@@ -20,19 +20,24 @@ from PyQt4.QtCore import QThread, pyqtSignal
 
 
 class _Gate(QThread):
-    valueChanged = pyqtSignal(int, bool)
+    inValueChanged = pyqtSignal(int, bool)
+    outValueChanged = pyqtSignal(bool)
 
     def __init__(self):
         super(_Gate, self).__init__()
         self._inputs = list()
         self._gates = list()
         self._running = True
+        self._value = False
         self.start()
 
     def run(self):
         while self._running:
             self.msleep(1)
             value = self.compute()
+            if value != self._value:  # TODO: Test if we could for inside if
+                self.outValueChanged.emit(value)
+                self._value = value
             for (gate, index) in self._gates:
                 gate.changeInput(index, value)
 
@@ -40,10 +45,16 @@ class _Gate(QThread):
         self._running = False
 
     def addWire(self, gate, index):
-        self._gates.append((gate, index))
+        try:
+            self._gates.append((gate, index))
+        except IndexError:
+            raise lgsiperr.InvalidInputIndexError
 
     def removeWire(self, gate, index):
-        self._gates.remove((gate, index))
+        try:
+            self._gates.remove((gate, index))
+        except IndexError:
+            raise lgsiperr.InvalidInputIndexError
 
     def connections(self):
         return self._gates
@@ -52,7 +63,7 @@ class _Gate(QThread):
         try:
             if self._inputs[index] != value:
                 self._inputs[index] = value
-                self.valueChanged.emit(index, value)
+                self.inValueChanged.emit(index, value)
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
 

@@ -26,9 +26,10 @@ class IC(object):
         self._gates = list()
         for gate in gates:
             if isinstance(gate, BinaryInput):
-                self._inputs_.setdefault(
-                    gate, list()
-                ).extend(gate.connections())
+                conn = gate.connections()
+                self._inputs_.setdefault(gate, list()).extend(conn)
+                for g, i in conn:
+                    g.changeInput(i, False)
             elif isinstance(gate, BinaryOutput):
                 self._outputs_.setdefault(gate, list())
             else:
@@ -43,10 +44,10 @@ class IC(object):
         self._outputs = list()
         for gate, conn in self._inputs_.items():
             self._inputs.append(conn)
-            del gate
+            gate.die()
         for gate, conn in self._outputs_.items():
             self._outputs.append(conn)
-            del gate
+            gate.die()
 
     def addWire(self, gate, output, input):
         self._outputs[output].addWire(gate, input)

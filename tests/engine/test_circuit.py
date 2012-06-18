@@ -216,6 +216,11 @@ class TestIC(GateTest):
         self.a1.addWire(self.o, 0)
         self.a2.addWire(self.o, 1)
 
+    def _prepare2(self, i1, i2, i3):
+        self.i21 = io.BinaryInput(i1)
+        self.i22 = io.BinaryInput(i2)
+        self.i23 = io.BinaryInput(i3)
+
     def test_integration(self):
         self._prepare(False, False, False)
         self.out = io.BinaryOutput()
@@ -228,6 +233,12 @@ class TestIC(GateTest):
         ])
         assert(ic._outputs == [[(self.o, 0)]])
         assert(ic._gates == [self.a1, self.a2, self.o, self.n])
+        assert False, "It needs more assertions here."  # TODO
+
+    def test_connection(self):
+        assert False
+
+    def test_disintegration(self):
         assert False
 
     def tearDown(self):
