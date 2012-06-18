@@ -49,7 +49,7 @@ class TestClock(GateTest):
         self.c = io.Clock(10)
         self.o = io.BinaryOutput()
         self.c.addWire(self.o, 0)
-        self.o.valueChanged.connect(self._increment)
+        self.o.inValueChanged.connect(self._increment)
 
     def test_should_tick(self):
         self._limit = [[self.o]]
@@ -73,8 +73,8 @@ class _BasicGateTest(GateTest):
         self.i2 = io.BinaryInput(i2)
         self.i1.addWire(self.g, 0)
         self.i2.addWire(self.g, 1)
-        self.i1.valueChanged.connect(self._increment)
-        self.i2.valueChanged.connect(self._increment)
+        self.i1.inValueChanged.connect(self._increment)
+        self.i2.inValueChanged.connect(self._increment)
 
     def tearDown(self):
         self.i1.die()
@@ -89,7 +89,7 @@ class TestOr(_BasicGateTest):
     def setUp(self):
         super(TestOr, self).setUp()
         self.g = basic.Or(2)
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
@@ -120,7 +120,7 @@ class TestAnd(_BasicGateTest):
     def setUp(self):
         super(TestAnd, self).setUp()
         self.g = basic.And(2)
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_first_value_is_false(self):
         self._prepare(False, True)
@@ -151,7 +151,7 @@ class TestNand(_BasicGateTest):
     def setUp(self):
         super(TestNand, self).setUp()
         self.g = compound.Nand(2)
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_true_when_first_value_is_true(self):
         self._prepare(True, False)
@@ -182,7 +182,7 @@ class TestNor(_BasicGateTest):
     def setUp(self):
         super(TestNor, self).setUp()
         self.g = compound.Nor(2)
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_first_value_is_true(self):
         self._prepare(True, False)
@@ -213,7 +213,7 @@ class TestXor(_BasicGateTest):
     def setUp(self):
         super(TestXor, self).setUp()
         self.g = compound.Xor()
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_both_values_are_false(self):
         self._prepare(False, False)
@@ -244,7 +244,7 @@ class TestXnor(_BasicGateTest):
     def setUp(self):
         super(TestXnor, self).setUp()
         self.g = compound.Xnor()
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_first_value_is_true(self):
         self._prepare(True, False)
@@ -275,12 +275,12 @@ class TestNot(GateTest):
     def setUp(self):
         super(TestNot, self).setUp()
         self.g = basic.Not()
-        self.g.valueChanged.connect(self._increment)
+        self.g.inValueChanged.connect(self._increment)
 
     def _prepare(self, i):
         self.i = io.BinaryInput(i)
         self.i.addWire(self.g, 0)
-        self.i.valueChanged.connect(self._increment)
+        self.i.inValueChanged.connect(self._increment)
 
     def test_should_be_false_when_value_is_true(self):
         self._prepare(True)
