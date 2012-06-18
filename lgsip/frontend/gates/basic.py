@@ -57,7 +57,7 @@ class Or(BasicGate):
 
 class Not(BasicGate):
     def __init__(self, parent=None):
-        super(Not, self). __init__(0, 1, parent)
+        super(Not, self). __init__(1, 1, parent)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
 

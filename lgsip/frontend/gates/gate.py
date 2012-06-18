@@ -171,7 +171,9 @@ class Gate(QtGui.QWidget):
         self._drawPath()
 
     def _drawWires(self):
-        if self._inputs:
+        if self._inputs == 1 and self._outputs == 1:  # Not hack
+            self.h = 40
+        elif self._inputs:
             self.h = 24 + 24 * (self._inputs - 1)
         elif self._outputs:
             self.h = 24 + 24 * (self._outputs - 1)
