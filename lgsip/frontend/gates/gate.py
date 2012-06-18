@@ -307,6 +307,7 @@ class BasicGate(Gate):
 
     def _addWire(self):
         self._inputs += 1
+        self._gate.addInput()
         self._drawWires()
         self._drawButtons()
         self._drawPath()

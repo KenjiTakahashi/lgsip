@@ -37,6 +37,7 @@ class Nor(BasicGate):
 class Xor(BasicGate):
     def __init__(self):
         super(Xor, self).__init__(2, "Xor")
+        self._extendable = False
 
     def compute(self):
         return self._inputs[0] ^ self._inputs[1]
@@ -45,6 +46,7 @@ class Xor(BasicGate):
 class Xnor(BasicGate):
     def __init__(self):
         super(Xnor, self).__init__(2, "Xnor")
+        self._extendable = False
 
     def compute(self):
         return not self._inputs[0] ^ self._inputs[1]

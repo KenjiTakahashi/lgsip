@@ -37,6 +37,7 @@ class Or(BasicGate):
 class Not(BasicGate):
     def __init__(self):
         super(Not, self).__init__(1, "Not")
+        self._extendable = False
 
     def compute(self):
         return not self._inputs[0]

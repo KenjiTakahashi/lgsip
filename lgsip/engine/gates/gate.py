@@ -53,6 +53,7 @@ class _Gate(QThread):
     def removeWire(self, gate, index):
         try:
             self._gates.remove((gate, index))
+            gate.changeInput(index, False)
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
 
@@ -77,6 +78,15 @@ class BasicGate(_Gate):
         if name != "Not" and number < 2:
             raise lgsiperr.NotEnoughInputsError
         self._inputs += [False] * number
+        self._extendable = True
+
+    def addInput(self):
+        if self._extendable:
+            self._inputs.append(False)
+
+    def removeInput(self):
+        if self._extendable and len(self._inputs) > 2:
+            self._inputs.pop()
 
 
 class IOGate(_Gate):
