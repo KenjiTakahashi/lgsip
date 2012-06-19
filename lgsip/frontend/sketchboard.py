@@ -16,8 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
-from PyQt4.QtCore import Qt, QRectF
-from lgsip.frontend.gates.gate import DeleteGateButton
+from PyQt4.QtCore import Qt, QRectF, QPointF
+from lgsip.frontend.gates.gate import DeleteGateButton, _LgsipGateButton
 
 
 class Wire(QtGui.QGraphicsObject):
@@ -87,6 +87,18 @@ class Wire(QtGui.QGraphicsObject):
         print(event.pos())
 
 
+class IntegrateGateButton(_LgsipGateButton):
+    def __init__(self, parent=None):
+        super(IntegrateGateButton, self).__init__(parent)
+        self.path.addPolygon(QtGui.QPolygonF([
+            QPointF(3, 3), QPointF(7, 8), QPointF(3, 13)
+        ]))
+        self.path.addPolygon(QtGui.QPolygonF([
+            QPointF(13, 3), QPointF(9, 8), QPointF(13, 13)
+        ]))
+        self.color = QtGui.QColor(0, 0, 160)
+
+
 class _RubberBand(QtGui.QGraphicsObject):
     def __init__(self, parent=None):
         super(_RubberBand, self).__init__(parent)
@@ -94,8 +106,11 @@ class _RubberBand(QtGui.QGraphicsObject):
         self.setZValue(-2)
         self._delete = DeleteGateButton()
         self._delete.clicked.connect(self._deleteGates)
+        self._integrate = IntegrateGateButton()
         proxy = QtGui.QGraphicsProxyWidget(self)
         proxy.setWidget(self._delete)
+        proxy2 = QtGui.QGraphicsProxyWidget(self)
+        proxy2.setWidget(self._integrate)
 
     def setStart(self, pos):
         self.x, self.y = pos.x(), pos.y()
@@ -108,9 +123,12 @@ class _RubberBand(QtGui.QGraphicsObject):
             y = self.ny - 20
         if self.nx < self.x:
             x = self.nx + 4
+            x2 = x + 20
         else:
             x = self.nx - 20
+            x2 = x - 20
         self._delete.move(x, y)
+        self._integrate.move(x2, y)
 
     def _deleteGates(self):
         scene = self.scene()

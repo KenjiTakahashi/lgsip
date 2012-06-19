@@ -63,16 +63,14 @@ class DeleteGateButton(_LgsipGateButton):
         self.color = QtGui.QColor(0, 0, 160)
 
 
-class DesintegrateGateButton(_LgsipGateButton):
+class DisintegrateGateButton(_LgsipGateButton):
     def __init__(self, parent=None):
-        super(DesintegrateGateButton, self).__init__(parent)
+        super(DisintegrateGateButton, self).__init__(parent)
         self.path.addPolygon(QtGui.QPolygonF([
-            QPointF(3, 8), QPointF(6, 3), QPointF(8, 5),
-            QPointF(5, 8), QPointF(8, 13), QPointF(6, 13)
+            QPointF(7, 3), QPointF(3, 8), QPointF(7, 13)
         ]))
         self.path.addPolygon(QtGui.QPolygonF([
-            QPointF(8, 5), QPointF(10, 3), QPointF(13, 8),
-            QPointF(10, 13), QPointF(8, 13), QPointF(11, 8)
+            QPointF(9, 3), QPointF(13, 8), QPointF(9, 13)
         ]))
         self.color = QtGui.QColor(0, 0, 160)
 
@@ -212,10 +210,10 @@ class Gate(QtGui.QWidget):
         if self._integrated:
             self.delete.move(20, delta - 16)
             if not hasattr(self, "desintegrate"):
-                self.desintegrate = DesintegrateGateButton(self)
-            self.desintegrate.move(20, delta - 4)
-            self._buttons.add(self.desintegrate)
-            self.desintegrate.show()
+                self.disintegrate = DisintegrateGateButton(self)
+            self.disintegrate.move(20, delta - 4)
+            self._buttons.add(self.disintegrate)
+            self.disintegrate.show()
         else:
             self.delete.move(20, delta - 8)
         self.delete.show()
