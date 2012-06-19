@@ -39,7 +39,10 @@ class _Gate(QThread):
                 self.outValueChanged.emit(value)
                 self._value = value
             for (gate, index) in self._gates:
-                gate.changeInput(index, value)
+                try:
+                    gate.changeInput(index, value)
+                except lgsiperr.InvalidInputIndexError:
+                    self._gates.remove((gate, index))
 
     def die(self):
         self._running = False
@@ -85,6 +88,14 @@ class BasicGate(_Gate):
             self._inputs.append(False)
 
     def removeInput(self):
+        """Completely removes an input from the gate.
+
+        All connections to this input stay until an update is called,
+        they are then wiped.
+
+        You cannot remove input from a gate which is non-extendable or
+        if there are only 2 inputs (it makes no sense anyway).
+        """
         if self._extendable and len(self._inputs) > 2:
             self._inputs.pop()
 

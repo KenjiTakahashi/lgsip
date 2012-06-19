@@ -110,6 +110,9 @@ class WireButton(_LgsipGateButton):
     def deleteWires(self):
         for wire in self._swires:
             wire.deleteLater()
+        self.deleteEWires()
+
+    def deleteEWires(self):
         for wire in self._ewires:
             wire.deleteLater()
 
@@ -318,6 +321,8 @@ class BasicGate(Gate):
     def _removeWire(self):
         if self._inputs > 2:
             self._inputs -= 1
+            self._gate.removeInput()
+            self._inbuttons.pop().deleteEWires()
             self._drawWires()
             self._drawButtons()
             self._drawPath()
