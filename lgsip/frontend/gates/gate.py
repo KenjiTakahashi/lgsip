@@ -171,15 +171,24 @@ class Gate(QtGui.QWidget):
         self._drawButtons()
         self._drawPath()
 
-    def _drawWires(self):
-        if self._inputs == 1 and self._outputs == 1:  # Not hack
-            self.h = 40
-        elif self._inputs:
-            self.h = 24 + 24 * (self._inputs - 1)
+    def calculateHeight(self):
+        """Returns gate height, calculated basing on the number of
+        inputs/outputs.
+
+        Specific gate implementation could reimplement this method
+        to provide a different calculation algorithm.
+        It should return a valid height, i.e. an integer greater than 0.
+        """
+        if self._inputs:
+            h = 24 + 24 * (self._inputs - 1)
         elif self._outputs:
-            self.h = 24 + 24 * (self._outputs - 1)
+            h = 24 + 24 * (self._outputs - 1)
         else:  # this should never happen
-            self.h = 40
+            h = 40
+        return h
+
+    def _drawWires(self):
+        self.h = self.calculateHeight()
         self.setFixedHeight(self.h)
         delta = self.h / (self._inputs + 1)
         for i in range(1, self._inputs + 1):

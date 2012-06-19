@@ -73,6 +73,9 @@ class Not(BasicGate):
     def _wireButtons(self):
         return False
 
+    def calculateHeight(self):
+        return 40
+
     def _drawPath(self):
         super(Not, self)._drawPath()
         self.path.addPolygon(QtGui.QPolygonF([
