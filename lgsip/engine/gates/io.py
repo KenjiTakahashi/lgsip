@@ -53,6 +53,9 @@ class Clock(IOGate):
     def _timeout(self):
         self._inputs[0] = not self._inputs[0]
 
+    def setTimeout(self, timeout):
+        self._timer.setInterval(timeout)
+
     def slower(self):
         self._timer.setInterval(self.interval() + 20)
 

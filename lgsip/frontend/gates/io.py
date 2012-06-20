@@ -77,9 +77,29 @@ class Clock(InputGate):
     def __init__(self, timeout=1000, parent=None):
         super(Clock, self).__init__(parent=parent)
         self.path.addRect(20, 0, 40, self.h)
-        self.time = QtGui.QLineEdit(self)
-        self.time.setFixedSize(18, 18)
-        self.time.move(38, 3)
+        self.delete.move(32, 3)
+        self.time = QtGui.QLineEdit(str(timeout), self)
+        self.time.setStyleSheet('background-color: none;')
+        self.time.setFixedSize(34, 18)
+        self.time.move(23, 20)
+        self.time.setValidator(QtGui.QIntValidator())
         self._gate = io.Clock(timeout)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
+        self.time.textChanged.connect(self._setTimeout)
+
+    def _setTimeout(self, timeout):
+        try:
+            timeout = int(timeout)
+        except ValueError:
+            self.time.setText('1000')
+            self._gate.setTimeout(1000)
+        else:
+            if timeout > 0:
+                self._gate.setTimeout(int(timeout))
+            else:
+                self.time.setText('1000')
+                self._gate.setTimeout(1000)
+
+    def calculateHeight(self):
+        return 40
