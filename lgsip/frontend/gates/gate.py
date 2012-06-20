@@ -89,6 +89,12 @@ class WireButton(_LgsipGateButton):
         self._swires.append(wire)
 
     def addEndWire(self, wire, gate):
+        """Adds a wire that ends in this input/output.
+
+        Args:
+            wire: a reference to the wire
+            gate: source gate (where the wire has started)
+        """
         self._ewires.append(wire)
         self.parent().connect(self, gate)
 

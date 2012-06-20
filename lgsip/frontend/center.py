@@ -96,6 +96,18 @@ class ClosePushButton(_LgsipPushButton):
         painter.drawPath(self.path)
 
 
+class SavePushButton(_LgsipPushButton):
+    def __init__(self, parent=None):
+        super(SavePushButton, self).__init__(parent)
+        # TODO: Add path
+
+
+class LoadPushButton(_LgsipPushButton):
+    def __init__(self, parent=None):
+        super(LoadPushButton, self).__init__(parent)
+        # TODO: Add path
+
+
 class _LgsipTabBarButtons(QtGui.QWidget):
     closeClicked = pyqtSignal(QtGui.QWidget)
 
@@ -106,8 +118,12 @@ class _LgsipTabBarButtons(QtGui.QWidget):
         self.stop = StopPushButton()
         self.close = ClosePushButton()
         self.close.clicked.connect(self._closeClicked)
+        self.save = SavePushButton()
+        self.load = LoadPushButton()
         layout = QtGui.QHBoxLayout()
         layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(self.load)
+        layout.addWidget(self.save)
         layout.addWidget(self.start)
         layout.addWidget(self.stop)
         layout.addWidget(self.close)
@@ -136,6 +152,8 @@ class LgsipTabWidget(QtGui.QTabWidget):
         index = super(LgsipTabWidget, self).addTab(widget, name)
         buttons = _LgsipTabBarButtons(widget)
         buttons.closeClicked.connect(self.removeTab)
+        buttons.load.clicked.connect(widget.load)
+        buttons.save.clicked.connect(widget.save)
         self.tabBar().setTabButton(index, QtGui.QTabBar.RightSide, buttons)
         self.setCurrentIndex(index)
 

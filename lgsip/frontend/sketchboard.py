@@ -18,6 +18,8 @@
 from PyQt4 import QtGui
 from PyQt4.QtCore import Qt, QRectF, QPointF
 from lgsip.frontend.gates.gate import DeleteGateButton, _LgsipGateButton
+from uuid import uuid4
+import imp
 
 
 class Wire(QtGui.QGraphicsObject):
@@ -79,7 +81,7 @@ class Wire(QtGui.QGraphicsObject):
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
             if self._endParent:
-                self._startParent.disconnect(self._endParent)
+                self._startParent.parent().disconnect(self._endParent)
             self.deleteLater()
 
     def mouseMoveEvent(self, event):
@@ -174,8 +176,9 @@ class _LgsipScene(QtGui.QGraphicsScene):
             self._wire = None
             self._sender = None
         elif not self._wire:
+            self._direction = direction
             self._sender = realSender
-            self._wire = Wire(self._sender.propagating, self.sender())
+            self._wire = Wire(self._sender.propagating, realSender)
             self._sender.addStartWire(self._wire, self.sender().pos())
             self.addItem(self._wire)
 
@@ -224,6 +227,94 @@ class SketchBoard(QtGui.QGraphicsView):
         self.setViewportUpdateMode(self.FullViewportUpdate)
         self.setMouseTracking(True)
         self.setScene(_LgsipScene())
+
+    def save(self):
+        dialog = QtGui.QFileDialog(
+            self, self.tr("Save circuit"),
+            filter=self.tr("Circuit files (*.lgsip)")
+        )
+        dialog.setFileMode(dialog.AnyFile)
+        result = dialog.exec_()
+        if result:
+            filename = dialog.selectedFiles()[0]
+            if filename[-6:] != ".lgsip":
+                filename += ".lgsip"
+
+            def a(widget):
+                name = widget.__class__.__name__
+                if name == 'BinaryInput':
+                    return widget._switch.isChecked()
+                elif name == 'Clock':
+                    text = widget.time.text()
+                    return text and text or 1000
+                elif name in ['And', 'Or', 'Nand', 'Nor']:
+                    return len(widget._inbuttons)
+                else:
+                    return ""
+            with open(filename, 'w') as f:
+                uuids = dict()
+                wires = dict()
+                f.write("from PyQt4.QtCore import QPointF, QPoint\n")
+                f.write("from lgsip.frontend.sketchboard import Wire\n")
+                f.write("from lgsip.frontend.gates.io import *\n")
+                f.write("from lgsip.frontend.gates.basic import *\n\n\n")
+                f.write("def load(self):\n")
+                for item in self.items():
+                    try:
+                        widget = item.widget()
+                        uuid = "g{0}".format(uuid4().int)
+                        uuids[widget] = uuid
+                        f.write("    {0} = {1}({2})\n".format(
+                            uuid, widget.__class__.__name__, a(widget)
+                        ))
+                        f.write("    p = self.addWidget({0})\n".format(uuid))
+                        pos = item.scenePos()
+                        f.write("    p.setPos(QPointF({0}, {1}))\n".format(
+                            pos.x(), pos.y()
+                        ))
+                    except AttributeError:
+                        wires[item._startParent] = (
+                            item._endParent,
+                            (item.x, item.y), (item.nx, item.ny)
+                        )
+                for sParent, (eParent, (x, y), (nx, ny)) in wires.items():
+                    uuid = "w{0}".format(uuid4().int)
+                    startParent = uuids[sParent.parent()]
+                    endParent = uuids[eParent.parent()]
+                    f.write("    {0} = Wire(realParent={1})\n".format(
+                        uuid, startParent
+                    ))
+                    f.write("    {0}.setEndParent({1})\n".format(
+                        uuid, endParent
+                    ))
+                    f.write("    self.addItem({0})\n".format(uuid))
+                    pos = sParent.parent().pos()
+                    f.write("    {0}._outbuttons[{1}]".format(
+                        startParent,
+                        sParent.parent()._outbuttons.index(sParent)
+                    ))
+                    f.write(".addStartWire({0}, QPoint({1}, {2}))\n".format(
+                        uuid, pos.x(), pos.y()
+                    ))
+                    pos = eParent.parent().pos()
+                    f.write("    {0}._inbuttons[{1}]".format(
+                        endParent, eParent.parent()._inbuttons.index(eParent)
+                    ))
+                    f.write(".addEndWire({0}, QPoint({1}, {2}), {3})\n".format(
+                        uuid, pos.x(), pos.y(), startParent
+                    ))
+
+    def load(self):
+        dialog = QtGui.QFileDialog(
+            self, self.tr("Load circuit"),
+            filter=self.tr("Circuit files (*.lgsip)")
+        )
+        dialog.setFileMode(dialog.ExistingFile)
+        result = dialog.exec_()
+        if result:
+            filename = dialog.selectedFiles()[0]
+            module = imp.load_source("circuit", filename)
+            module.load(self.scene())
 
     def dragEnterEvent(self, event):
         data = event.mimeData()

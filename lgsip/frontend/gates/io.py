@@ -42,12 +42,12 @@ class _SwitchButton(QtGui.QPushButton):
 class BinaryInput(InputGate):
     switched = pyqtSignal(bool)
 
-    def __init__(self, parent=None):
+    def __init__(self, value=False, parent=None):
         super(BinaryInput, self).__init__(parent=parent)
         self.path.addRect(20, 0, 40, self.h)
         self._switch = _SwitchButton(self)
         self._switch.clicked.connect(self._switched)
-        self._gate = io.BinaryInput()
+        self._gate = io.BinaryInput(value)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
 
@@ -73,12 +73,12 @@ class BinaryOutput(OutputGate):
 
 
 class Clock(InputGate):
-    def __init__(self, parent=None):
+    def __init__(self, timeout=1000, parent=None):
         super(Clock, self).__init__(parent=parent)
         self.path.addRect(20, 0, 40, self.h)
         self.time = QtGui.QLineEdit(self)
         self.time.setFixedSize(18, 18)
         self.time.move(38, 3)
-        self._gate = io.Clock()
+        self._gate = io.Clock(timeout)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
