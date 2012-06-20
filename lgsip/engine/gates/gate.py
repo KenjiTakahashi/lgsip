@@ -15,8 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from lgsip.engine import lgsiperr
+from lgsip.engine import lgsiperr, ic
 from PyQt4.QtCore import QThread, pyqtSignal
+import imp
 
 
 class _Gate(QThread):
@@ -102,3 +103,9 @@ class BasicGate(_Gate):
 
 class IOGate(_Gate):
     pass
+
+
+class ComplexGate(ic.IC):
+    def __init__(self, name, parent=None):
+        module = imp.load_source("complex_gate", name)
+        module.load(self)

@@ -273,8 +273,12 @@ class SketchBoard(QtGui.QGraphicsView):
                 wires = dict()
                 f.write("from PyQt4.QtCore import QPointF, QPoint\n")
                 f.write("from lgsip.frontend.sketchboard import Wire\n")
-                f.write("from lgsip.frontend.gates.io import *\n")
-                f.write("from lgsip.frontend.gates.basic import *\n\n\n")
+                f.write("from lgsip.frontend.gates.io import")
+                f.write("BinaryInput, BinaryOutput, Clock\n")
+                f.write("from lgsip.frontend.gates.basic import")
+                f.write("And, Or, Not\n")
+                f.write("from lgsip.frontend.gate.compound import")
+                f.write("Nor, Nand, Xor, Xnor\n")
                 f.write("def load(self):\n")
                 for item in self.items():
                     try:
@@ -290,11 +294,8 @@ class SketchBoard(QtGui.QGraphicsView):
                             pos.x(), pos.y()
                         ))
                     except AttributeError:
-                        wires[item._startParent] = (
-                            item._endParent,
-                            (item.x, item.y), (item.nx, item.ny)
-                        )
-                for sParent, (eParent, (x, y), (nx, ny)) in wires.items():
+                        wires[item._startParent] = item._endParent
+                for sParent, eParent in wires.items():
                     uuid = "w{0}".format(uuid4().int)
                     startParent = uuids[sParent.parent()]
                     endParent = uuids[eParent.parent()]
