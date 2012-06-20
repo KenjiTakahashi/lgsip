@@ -46,6 +46,7 @@ class BinaryInput(InputGate):
         super(BinaryInput, self).__init__(parent=parent)
         self.path.addRect(20, 0, 40, self.h)
         self._switch = _SwitchButton(self)
+        self._switch.setChecked(value)
         self._switch.clicked.connect(self._switched)
         self._gate = io.BinaryInput(value)
         self._gate.inValueChanged.connect(self.setInPropagating)

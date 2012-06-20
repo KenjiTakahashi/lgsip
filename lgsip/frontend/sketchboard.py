@@ -23,13 +23,13 @@ import imp
 
 
 class Wire(QtGui.QGraphicsObject):
-    def __init__(self, propagating=False, realParent=None, parent=None):
+    def __init__(self, propagating=False, parent=None):
         super(Wire, self).__init__(parent)
         self.setZValue(-1)
         self.setFlag(self.ItemIsSelectable, True)
         self.x, self.y, self.nx, self.ny = 0, 0, 0, 0
         self._propagating = propagating
-        self._startParent = realParent
+        self._startParent = None
         self._endParent = None
 
     def setStart(self, x, y):
@@ -37,6 +37,9 @@ class Wire(QtGui.QGraphicsObject):
 
     def setEnd(self, x, y):
         self.nx, self.ny = x, y
+
+    def setStartParent(self, parent):
+        self._startParent = parent
 
     def setEndParent(self, parent):
         self._endParent = parent
@@ -169,17 +172,28 @@ class _LgsipScene(QtGui.QGraphicsScene):
 
     def wire(self, realSender, direction):
         if self._wire and self._direction != direction:
-            realSender.addEndWire(
-                self._wire, self.sender().pos(), self._sender.parent()
-            )
-            self._wire.setEndParent(realSender)
+            if not direction:
+                realSender.addEndWire(
+                    self._wire, self.sender().pos(), self._sender.parent()
+                )
+                self._wire.setEndParent(realSender)
+            else:
+                realSender.addStartWire(
+                    self._wire, self.sender().pos(), self._sender.parent()
+                )
+                self._wire.setStartParent(realSender)
             self._wire = None
             self._sender = None
         elif not self._wire:
             self._direction = direction
             self._sender = realSender
-            self._wire = Wire(self._sender.propagating, realSender)
-            self._sender.addStartWire(self._wire, self.sender().pos())
+            self._wire = Wire(self._sender.propagating)
+            if direction:
+                self._sender.addStartWire(self._wire, self.sender().pos())
+                self._wire.setStartParent(self._sender)
+            else:
+                self._sender.addEndWire(self._wire, self.sender().pos())
+                self._wire.setEndParent(self._sender)
             self.addItem(self._wire)
 
     def mousePressEvent(self, event):
@@ -210,7 +224,10 @@ class _LgsipScene(QtGui.QGraphicsScene):
     def mouseMoveEvent(self, event):
         if self._wire:
             pos = event.scenePos()
-            self._wire.setEnd(pos.x(), pos.y())
+            if self._direction:
+                self._wire.setEnd(pos.x(), pos.y())
+            else:
+                self._wire.setStart(pos.x(), pos.y())
         elif self._rubber_:
             self._rubber.setEnd(event.scenePos())
         self.update()
@@ -281,9 +298,10 @@ class SketchBoard(QtGui.QGraphicsView):
                     uuid = "w{0}".format(uuid4().int)
                     startParent = uuids[sParent.parent()]
                     endParent = uuids[eParent.parent()]
-                    f.write("    {0} = Wire(realParent={1})\n".format(
-                        uuid, startParent
-                    ))
+                    f.write("    {0} = Wire()\n".format(uuid))
+                    f.write("    {0}.setStartParent({1})\n".format(
+                        uuid, startParent)
+                    )
                     f.write("    {0}.setEndParent({1})\n".format(
                         uuid, endParent
                     ))

@@ -85,10 +85,12 @@ class WireButton(_LgsipGateButton):
         self._ewires = list()
         self.propagating = False
 
-    def addStartWire(self, wire):
+    def addStartWire(self, wire, gate=None):
         self._swires.append(wire)
+        if gate:
+            self.parent().connect(wire._endParent, gate, False)
 
-    def addEndWire(self, wire, gate):
+    def addEndWire(self, wire, gate=None):
         """Adds a wire that ends in this input/output.
 
         Args:
@@ -96,7 +98,8 @@ class WireButton(_LgsipGateButton):
             gate: source gate (where the wire has started)
         """
         self._ewires.append(wire)
-        self.parent().connect(self, gate)
+        if gate:
+            self.parent().connect(self, gate, True)
 
     def cancelWire(self, wire):
         self._swires.remove(wire)
@@ -122,12 +125,12 @@ class WireButton(_LgsipGateButton):
 
 
 class InWireButton(WireButton):
-    def addStartWire(self, wire, pos):
-        super(InWireButton, self).addStartWire(wire)
+    def addStartWire(self, wire, pos, gate=None):
+        super(InWireButton, self).addStartWire(wire, gate)
         pos += self.pos()
         wire.setStart(pos.x(), pos.y() + 2)
 
-    def addEndWire(self, wire, pos, gate):
+    def addEndWire(self, wire, pos, gate=None):
         super(InWireButton, self).addEndWire(wire, gate)
         pos += self.pos()
         wire.setEnd(pos.x(), pos.y() + 2)
@@ -141,12 +144,12 @@ class InWireButton(WireButton):
 
 
 class OutWireButton(WireButton):
-    def addStartWire(self, wire, pos):
-        super(OutWireButton, self).addStartWire(wire)
+    def addStartWire(self, wire, pos, gate=None):
+        super(OutWireButton, self).addStartWire(wire, gate)
         pos += self.pos()
         wire.setStart(pos.x() + self.width(), pos.y() + 2)
 
-    def addEndWire(self, wire, pos, gate):
+    def addEndWire(self, wire, pos, gate=None):
         super(OutWireButton, self).addEndWire(wire, gate)
         pos += self.pos()
         wire.setEnd(pos.x() + self.width(), pos.y() + 2)
@@ -259,8 +262,11 @@ class Gate(QtGui.QWidget):
         # FIXME
         self._outbuttons[0].setPropagating(value)
 
-    def connect(self, wire, gate):
-        gate._gate.addWire(self._gate, self._inbuttons.index(wire))
+    def connect(self, wire, gate, flag):
+        if flag:
+            gate._gate.addWire(self._gate, self._inbuttons.index(wire))
+        else:
+            self._gate.addWire(gate._gate, gate._inbuttons.index(wire))
 
     def disconnect(self, wire):
         gate = wire.parent()
