@@ -63,11 +63,7 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
         self.header().close()
         self.itemClicked.connect(self._expandCollapse)
         for category in categories:
-            if isinstance(category, str):
-                module = self._module + category.lower()
-            else:
-                category, module = category
-                module = self._module + module
+            module = self._module + category.lower()
             item = QtGui.QTreeWidgetItem([category])
             self.addTopLevelItem(item)
             g = pyclbr.readmodule(module)
@@ -77,15 +73,19 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
                     item.addChild(subitem)
                     module_ = __import__(module, globals(), locals(), gate)
                     widget = getattr(module_, gate)()
-                    pixmap = QtGui.QPixmap(widget.sizeHint())
-                    pixmap.fill(Qt.transparent)
-                    widget.render(pixmap, flags=QtGui.QWidget.DrawChildren)
+                    pixmap = self.createPixmap(widget)
                     subitem.setData(0, 666, pixmap)
                     subitem.setData(0, 667, gate)
                     subitem.setData(0, 668, module)
-                    widget._gate.die()
-                    widget._gate.wait()
         self.expandAll()
+
+    def createPixmap(self, widget):
+        pixmap = QtGui.QPixmap(widget.sizeHint())
+        pixmap.fill(Qt.transparent)
+        widget.render(pixmap, flags=QtGui.QWidget.DrawChildren)
+        widget._gate.die()
+        widget._gate.wait()
+        return pixmap
 
     def _expandCollapse(self, item):
         if item.isExpanded():
@@ -112,9 +112,24 @@ class LgsipBasicGatesWidget(_LgsipGatesWidget):
         )
 
 
+from os import listdir
+from os.path import isfile, join, dirname, normpath
+from lgsip.frontend.gates.gate import ComplexGate
+
+
 class LgsipComplexGatesWidget(_LgsipGatesWidget):
     def __init__(self, parent=None):
-        super(LgsipComplexGatesWidget, self).__init__(
-            [('Built-in', 'complex')], parent
-        )
-        # add user-defined here (from .config/...)
+        super(LgsipComplexGatesWidget, self).__init__([], parent)
+        item = QtGui.QTreeWidgetItem([self.tr("Built-in")])
+        self.addTopLevelItem(item)
+        path = normpath(join(dirname(__file__), "..", "engine/gates/complex"))
+        for gate in [f for f in listdir(path)
+            if isfile(join(path, f)) and f[-6:] == '.lgsip'
+        ]:
+            subitem = QtGui.QTreeWidgetItem()
+            item.addChild(subitem)
+            pixmap = self.createPixmap(ComplexGate(join(path, gate)))
+            subitem.setData(0, 666, pixmap)
+        item = QtGui.QTreeWidgetItem([self.tr("User-defined")])
+        self.addTopLevelItem(item)
+        self.expandAll()

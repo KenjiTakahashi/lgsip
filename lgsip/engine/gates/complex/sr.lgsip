@@ -1,0 +1,25 @@
+from lgsip.engine.gates.io import BinaryInput, BinaryOutput, Clock
+from lgsip.engine.gates.basic import And, Or, Not
+from lgsip.engine.gates.compound import Nand, Nor, Xor, Xnor
+
+def load():
+    g1 = BinaryInput()
+    g2 = BinaryInput()
+    g3 = BinaryInput()
+    g4 = And(2)
+    g5 = And(2)
+    g6 = Nor(2)
+    g7 = Nor(2)
+    g8 = BinaryOutput()
+    g9 = BinaryOutput()
+    g1.addWire(g4, 0)
+    g2.addWire(g4, 1)
+    g2.addWire(g5, 1)
+    g3.addWire(g5, 0)
+    g4.addWire(g6, 0)
+    g5.addWire(g7, 0)
+    g6.addWire(g7, 1)
+    g7.addWire(g6, 1)
+    g6.addWire(g8, 0)
+    g7.addWire(g9, 0)
+    return ("S-R", 3, 2, [g1, g2, g3, g4, g5, g6, g7, g8, g9])

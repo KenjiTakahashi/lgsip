@@ -358,3 +358,23 @@ class InputGate(Gate):
 class OutputGate(Gate):
     def __init__(self, inputs=1, parent=None):
         super(OutputGate, self).__init__(inputs, 0, parent)
+
+
+import os
+import imp
+from lgsip.engine.ic import IC
+
+
+class ComplexGate(Gate):
+    def __init__(self, name, parent=None):
+        if not os.path.isfile(name):
+            raise Exception
+        module = imp.load_source("complex_gate", name)
+        (name, inputs, outputs, gates) = module.load()
+        super(ComplexGate, self).__init__(inputs, outputs, parent)
+        self.name = name
+        self._gate = IC(*gates)
+
+    def _drawPath(self):
+        super(ComplexGate, self)._drawPath()
+        self.path.addRect(20, 0, 40, self.h)

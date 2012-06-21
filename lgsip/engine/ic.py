@@ -54,3 +54,9 @@ class IC(object):
 
     def wire(self, index):
         return self._inputs[index]
+
+    def die(self):
+        pass
+
+    def wait(self):
+        pass
