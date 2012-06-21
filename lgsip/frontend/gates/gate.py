@@ -169,7 +169,6 @@ class Gate(QtGui.QWidget):
 
     def __init__(self, inputs=1, outputs=1, parent=None, integrated=False):
         super(Gate, self).__init__(parent)
-        self._sketched = False
         self._integrated = integrated
         self.setStyleSheet('background-color: transparent;')
         self.setFixedWidth(80)
@@ -253,9 +252,6 @@ class Gate(QtGui.QWidget):
             button.deleteWires()
         super(Gate, self).deleteLater()
 
-    def setSketched(self, val):
-        self._sketched = val
-
     def setInPropagating(self, i, value):
         self._inbuttons[i].setPropagating(value)
 
@@ -289,14 +285,12 @@ class Gate(QtGui.QWidget):
         painter.drawPath(self.path)
 
     def mousePressEvent(self, event):
-        if self._sketched:
-            self.offset = event.pos()
+        self.offset = event.pos()
 
     def mouseMoveEvent(self, event):
-        if self._sketched:
-            newPos = self.mapToParent(event.pos() - self.offset)
-            self.move(newPos)
-            self.moveWires(newPos)
+        newPos = self.mapToParent(event.pos() - self.offset)
+        self.move(newPos)
+        self.moveWires(newPos)
 
     def mouseReleaseEvent(self, event):
         self.offset = QPoint()

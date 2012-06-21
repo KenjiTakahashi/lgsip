@@ -172,7 +172,6 @@ class _LgsipScene(QtGui.QGraphicsScene):
             ).decode('utf-8')
             cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
             gate = getattr(__import__(module, globals(), locals(), cls), cls)()
-        gate.setSketched(True)
         gate.wiring.connect(self.wire)
         proxy = self.addWidget(gate)
         proxy.setPos(event.scenePos())
