@@ -97,8 +97,12 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
         index = self.currentIndex()
         if index.parent().isValid():
             data = QMimeData()
-            data.setData('lgsip/x-classname', index.data(667))
-            data.setData('lgsip/x-modulename', index.data(668))
+            filename = index.data(669)
+            if filename:
+                data.setData('lgsip/x-filename', filename)
+            else:
+                data.setData('lgsip/x-classname', index.data(667))
+                data.setData('lgsip/x-modulename', index.data(668))
             drag = QtGui.QDrag(self)
             drag.setMimeData(data)
             drag.setPixmap(index.data(666))
@@ -128,8 +132,10 @@ class LgsipComplexGatesWidget(_LgsipGatesWidget):
         ]:
             subitem = QtGui.QTreeWidgetItem()
             item.addChild(subitem)
-            pixmap = self.createPixmap(ComplexGate(join(path, gate)))
+            filename = join(path, gate)
+            pixmap = self.createPixmap(ComplexGate(filename))
             subitem.setData(0, 666, pixmap)
+            subitem.setData(0, 669, filename)
         item = QtGui.QTreeWidgetItem([self.tr("User-defined")])
         self.addTopLevelItem(item)
         self.expandAll()

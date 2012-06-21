@@ -162,9 +162,16 @@ class _LgsipScene(QtGui.QGraphicsScene):
 
     def dropEvent(self, event):
         data = event.mimeData()
-        module = bytes(data.data('lgsip/x-modulename').data()).decode('utf-8')
-        cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
-        gate = getattr(__import__(module, globals(), locals(), cls), cls)()
+        filename = data.data('lgsip/x-filename')
+        if filename:
+            from lgsip.frontend.gates.gate import ComplexGate
+            gate = ComplexGate(bytes(filename).decode('utf-8'))
+        else:
+            module = bytes(
+                data.data('lgsip/x-modulename').data()
+            ).decode('utf-8')
+            cls = bytes(data.data('lgsip/x-classname').data()).decode('utf-8')
+            gate = getattr(__import__(module, globals(), locals(), cls), cls)()
         gate.setSketched(True)
         gate.wiring.connect(self.wire)
         proxy = self.addWidget(gate)
@@ -338,7 +345,8 @@ class SketchBoard(QtGui.QGraphicsView):
     def dragEnterEvent(self, event):
         data = event.mimeData()
         if(data.hasFormat('lgsip/x-classname')
-        and data.hasFormat('lgsip/x-modulename')):
+        and data.hasFormat('lgsip/x-modulename')
+        or data.hasFormat('lgsip/x-filename')):
             event.acceptProposedAction()
 
     def dragMoveEvent(self, event):
