@@ -49,12 +49,12 @@ class IC(QObject):
         self._outputs = list()
         for gate, conn in self._inputs_.items():
             self._inputs.append(conn)
-            for (conn_, _) in conn:
+            for conn_, _ in conn:
                 conn_.inValueChanged.connect(self._inValueChanged)
             gate.die()
         for gate, conn in self._outputs_.items():
             self._outputs.append(conn)
-            for (conn_, _) in conn:
+            for conn_, _ in conn:
                 conn_.outValueChanged.connect(self._outValueChanged)
             gate.die()
 
@@ -68,7 +68,7 @@ class IC(QObject):
             self.inValueChanged.emit(index, value)
 
     def _outValueChanged(self, _, value):
-        index = 0
+        index = -1
         for _i, _output in enumerate(self._outputs):
             if (self.sender(), 0) in _output:
                 index = _i

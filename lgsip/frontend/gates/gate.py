@@ -165,10 +165,10 @@ class OutWireButton(WireButton):
 class Gate(QtGui.QWidget):
     wiring = pyqtSignal(object, int)
 
-    def __init__(self, inputs=1, outputs=1, parent=None):
+    def __init__(self, inputs=1, outputs=1, parent=None, integrated=False):
         super(Gate, self).__init__(parent)
         self._sketched = False
-        self._integrated = False
+        self._integrated = integrated
         self.setStyleSheet('background-color: transparent;')
         self.setFixedWidth(80)
         self.offset = QPoint()
@@ -230,7 +230,6 @@ class Gate(QtGui.QWidget):
             if not hasattr(self, "desintegrate"):
                 self.disintegrate = DisintegrateGateButton(self)
             self.disintegrate.move(20, delta - 4)
-            self._buttons.add(self.disintegrate)
             self.disintegrate.show()
         else:
             self.delete.move(20, delta - 8)
@@ -365,16 +364,21 @@ from lgsip.engine.ic import IC
 
 
 class ComplexGate(Gate):
-    def __init__(self, name, parent=None):
+    def __init__(self, name, pixmap=False, parent=None):
         if not os.path.isfile(name):
             raise Exception
         module = imp.load_source("complex_gate", name)
         (name, inputs, outputs, gates) = module.load()
-        super(ComplexGate, self).__init__(inputs, outputs, parent)
+        super(ComplexGate, self).__init__(inputs, outputs, parent, True)
         self.name = name
         self._gate = IC(*gates)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
+        if not pixmap:
+            for i, conn in enumerate(self._gate._outputs):
+                for conn_, _ in conn:
+                    if conn_.compute():
+                        self.setOutPropagating(i, True)
 
     def _drawPath(self):
         super(ComplexGate, self)._drawPath()

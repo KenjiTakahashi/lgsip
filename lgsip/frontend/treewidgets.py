@@ -133,7 +133,7 @@ class LgsipComplexGatesWidget(_LgsipGatesWidget):
             subitem = QtGui.QTreeWidgetItem()
             item.addChild(subitem)
             filename = join(path, gate)
-            pixmap = self.createPixmap(ComplexGate(filename))
+            pixmap = self.createPixmap(ComplexGate(filename, True))
             subitem.setData(0, 666, pixmap)
             subitem.setData(0, 669, filename)
         item = QtGui.QTreeWidgetItem([self.tr("User-defined")])
