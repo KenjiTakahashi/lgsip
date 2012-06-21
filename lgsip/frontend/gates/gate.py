@@ -371,8 +371,8 @@ class ComplexGate(Gate):
             raise Exception
         module = imp.load_source("complex_gate", name)
         (name, inputs, outputs, gates) = module.load()
-        super(ComplexGate, self).__init__(inputs, outputs, parent, True)
         self.name = name
+        super(ComplexGate, self).__init__(inputs, outputs, parent, True)
         self._gate = IC(*gates)
         self._gate.inValueChanged.connect(self.setInPropagating)
         self._gate.outValueChanged.connect(self.setOutPropagating)
@@ -385,3 +385,10 @@ class ComplexGate(Gate):
     def _drawPath(self):
         super(ComplexGate, self)._drawPath()
         self.path.addRect(20, 0, 40, self.h)
+
+    def paintEvent(self, event):
+        super(ComplexGate, self).paintEvent(event)
+        painter = QtGui.QPainter(self)
+        pen = QtGui.QPen(QtGui.QPalette().dark())
+        painter.setPen(pen)
+        painter.drawText(36, 30, 30, 20, 0, self.name)

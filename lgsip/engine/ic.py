@@ -52,11 +52,13 @@ class IC(QObject):
             for conn_, _ in conn:
                 conn_.inValueChanged.connect(self._inValueChanged)
             gate.die()
+            gate.wait()
         for gate, conn in self._outputs_.items():
             self._outputs.append(conn)
             for conn_, _ in conn:
                 conn_.outValueChanged.connect(self._outValueChanged)
             gate.die()
+            gate.wait()
 
     def _inValueChanged(self, i, value):
         index = -1

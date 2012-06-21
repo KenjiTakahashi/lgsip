@@ -99,13 +99,19 @@ class ClosePushButton(_LgsipPushButton):
 class SavePushButton(_LgsipPushButton):
     def __init__(self, parent=None):
         super(SavePushButton, self).__init__(parent)
-        # TODO: Add path
+        self.path.addPolygon(QtGui.QPolygonF([
+            QPointF(12, 17), QPointF(7, 12), QPointF(10, 12), QPointF(10, 7),
+            QPointF(14, 7), QPointF(14, 12), QPointF(17, 12)
+        ]))
 
 
 class LoadPushButton(_LgsipPushButton):
     def __init__(self, parent=None):
         super(LoadPushButton, self).__init__(parent)
-        # TODO: Add path
+        self.path.addPolygon(QtGui.QPolygonF([
+            QPointF(12, 7), QPointF(17, 12), QPointF(14, 12),
+            QPointF(14, 17), QPointF(10, 17), QPointF(10, 12), QPointF(7, 12)
+        ]))
 
 
 class _LgsipTabBarButtons(QtGui.QWidget):
