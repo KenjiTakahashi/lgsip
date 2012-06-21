@@ -49,7 +49,11 @@ class _Gate(QThread):
 
     def addWire(self, gate, index):
         try:
-            self._gates.append((gate, index))
+            if gate.__class__.__name__ == 'IC':
+                for conn in gate.wire(index):
+                    self._gates.append(conn)
+            else:
+                self._gates.append((gate, index))
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
 

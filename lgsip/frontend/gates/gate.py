@@ -373,6 +373,8 @@ class ComplexGate(Gate):
         super(ComplexGate, self).__init__(inputs, outputs, parent)
         self.name = name
         self._gate = IC(*gates)
+        self._gate.inValueChanged.connect(self.setInPropagating)
+        self._gate.outValueChanged.connect(self.setOutPropagating)
 
     def _drawPath(self):
         super(ComplexGate, self)._drawPath()

@@ -25,6 +25,7 @@ class IC(QObject):
     outValueChanged = pyqtSignal(int, bool)
 
     def __init__(self, *gates):
+        super(IC, self).__init__()
         self._inputs_ = OrderedDict()
         self._outputs_ = OrderedDict()
         self._gates = list()
@@ -59,18 +60,18 @@ class IC(QObject):
 
     def _inValueChanged(self, i, value):
         index = -1
-        for i, _input in enumerate(self._inputs):
+        for _i, _input in enumerate(self._inputs):
             if (self.sender(), i) in _input:
-                index = i
+                index = _i
                 break
         if index != -1:
             self.inValueChanged.emit(index, value)
 
     def _outValueChanged(self, _, value):
         index = 0
-        for i, _output in enumerate(self._outputs):
+        for _i, _output in enumerate(self._outputs):
             if (self.sender(), 0) in _output:
-                index = i
+                index = _i
                 break
         if index != -1:
             self.outValueChanged.emit(index, value)
