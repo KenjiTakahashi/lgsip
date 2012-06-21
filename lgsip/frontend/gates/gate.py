@@ -116,11 +116,13 @@ class WireButton(_LgsipGateButton):
 
     def deleteWires(self):
         for wire in self._swires:
+            wire._startParent.parent().disconnect(wire._endParent)
             wire.deleteLater()
         self.deleteEWires()
 
     def deleteEWires(self):
         for wire in self._ewires:
+            wire._startParent.parent().disconnect(wire._endParent)
             wire.deleteLater()
 
 
