@@ -258,9 +258,8 @@ class Gate(QtGui.QWidget):
     def setInPropagating(self, i, value):
         self._inbuttons[i].setPropagating(value)
 
-    def setOutPropagating(self, value):
-        # FIXME
-        self._outbuttons[0].setPropagating(value)
+    def setOutPropagating(self, i, value):
+        self._outbuttons[i].setPropagating(value)
 
     def connect(self, wire, gate, flag):
         if flag:

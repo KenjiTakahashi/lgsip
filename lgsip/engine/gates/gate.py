@@ -21,7 +21,7 @@ from PyQt4.QtCore import QThread, pyqtSignal
 
 class _Gate(QThread):
     inValueChanged = pyqtSignal(int, bool)
-    outValueChanged = pyqtSignal(bool)
+    outValueChanged = pyqtSignal(int, bool)
 
     def __init__(self):
         super(_Gate, self).__init__()
@@ -36,7 +36,7 @@ class _Gate(QThread):
             self.msleep(1)
             value = self.compute()
             if value != self._value:
-                self.outValueChanged.emit(value)
+                self.outValueChanged.emit(0, value)
                 self._value = value
             for (gate, index) in self._gates:
                 try:

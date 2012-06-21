@@ -17,9 +17,13 @@
 
 from lgsip.engine.gates.io import BinaryInput, BinaryOutput
 from collections import OrderedDict
+from PyQt4.QtCore import QObject, pyqtSignal
 
 
-class IC(object):
+class IC(QObject):
+    inValueChanged = pyqtSignal(int, bool)
+    outValueChanged = pyqtSignal(int, bool)
+
     def __init__(self, *gates):
         self._inputs_ = OrderedDict()
         self._outputs_ = OrderedDict()
@@ -44,19 +48,44 @@ class IC(object):
         self._outputs = list()
         for gate, conn in self._inputs_.items():
             self._inputs.append(conn)
+            for (conn_, _) in conn:
+                conn_.inValueChanged.connect(self._inValueChanged)
             gate.die()
         for gate, conn in self._outputs_.items():
             self._outputs.append(conn)
+            for (conn_, _) in conn:
+                conn_.outValueChanged.connect(self._outValueChanged)
             gate.die()
 
+    def _inValueChanged(self, i, value):
+        index = -1
+        for i, _input in enumerate(self._inputs):
+            if (self.sender(), i) in _input:
+                index = i
+                break
+        if index != -1:
+            self.inValueChanged.emit(index, value)
+
+    def _outValueChanged(self, _, value):
+        index = 0
+        for i, _output in enumerate(self._outputs):
+            if (self.sender(), 0) in _output:
+                index = i
+                break
+        if index != -1:
+            self.outValueChanged.emit(index, value)
+
     def addWire(self, gate, output, input):
-        self._outputs[output].addWire(gate, input)
+        for _output in self._outputs[output]:
+            _output.addWire(gate, input)
 
     def wire(self, index):
         return self._inputs[index]
 
     def die(self):
-        pass
+        for gate in self._gates:
+            gate.die()
 
     def wait(self):
-        pass
+        for gate in self._gates:
+            gate.wait()
