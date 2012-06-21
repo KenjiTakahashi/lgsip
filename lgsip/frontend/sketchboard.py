@@ -271,6 +271,8 @@ class SketchBoard(QtGui.QGraphicsView):
                 elif name == 'Clock':
                     text = widget.time.text()
                     return text and text or 1000
+                elif name == 'ComplexGate':
+                    return "'{0}'".format(widget._intname)
                 elif name in ['And', 'Or', 'Nand', 'Nor']:
                     return len(widget._inbuttons)
                 else:
@@ -280,12 +282,13 @@ class SketchBoard(QtGui.QGraphicsView):
                 wires = dict()
                 f.write("from PyQt4.QtCore import QPointF, QPoint\n")
                 f.write("from lgsip.frontend.sketchboard import Wire\n")
-                f.write("from lgsip.frontend.gates.io import")
+                f.write("from lgsip.frontend.gates.io import ")
                 f.write("BinaryInput, BinaryOutput, Clock\n")
-                f.write("from lgsip.frontend.gates.basic import")
+                f.write("from lgsip.frontend.gates.basic import ")
                 f.write("And, Or, Not\n")
-                f.write("from lgsip.frontend.gate.compound import")
+                f.write("from lgsip.frontend.gates.compound import ")
                 f.write("Nor, Nand, Xor, Xnor\n")
+                f.write("from lgsip.frontend.gates.gate import ComplexGate\n")
                 f.write("def load(self):\n")
                 for item in self.items():
                     try:

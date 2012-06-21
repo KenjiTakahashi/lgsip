@@ -369,6 +369,7 @@ class ComplexGate(Gate):
     def __init__(self, name, pixmap=False, parent=None):
         if not os.path.isfile(name):
             raise Exception
+        self._intname = name
         module = imp.load_source("complex_gate", name)
         (name, inputs, outputs, gates) = module.load()
         self.name = name
