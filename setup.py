@@ -34,7 +34,7 @@ setup(
         'lgsip.frontend.gates'
     ],
     package_data={
-        '': ['langs/*.qm', '*/*.rst']
+        '': ['langs/*.qm', '*/*.rst', '*/*.lgsip']
     },
     scripts=['scripts/lgsip'],
     classifiers=[f.strip() for f in """

@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from PyQt4 import QtGui
+from PyQt4.QtCore import QTranslator, QLocale
 from lgsip.frontend.center import LgsipTabWidget
 from lgsip.frontend.treewidgets import(
     LgsipBasicGatesWidget, LgsipComplexGatesWidget
@@ -40,8 +41,14 @@ class Main(QtGui.QMainWindow):
 
 def run():
     import sys
+    import os
     app = QtGui.QApplication(sys.argv)
     app.setApplicationName("lgsip")
+    translator = QTranslator()
+    locale = QLocale().system().name()
+    path = os.path.dirname(__file__)
+    if translator.load('main_' + locale, os.path.join(path, 'langs')):
+        app.installTranslator(translator)
     main = Main()
     main.show()
     sys.exit(app.exec_())

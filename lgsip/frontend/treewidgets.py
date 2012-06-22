@@ -62,9 +62,9 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
         self.setDragDropMode(self.DragOnly)
         self.header().close()
         self.itemClicked.connect(self._expandCollapse)
-        for category in categories:
-            module = self._module + category.lower()
-            item = QtGui.QTreeWidgetItem([category])
+        for name, id in categories:
+            module = self._module + id.lower()
+            item = QtGui.QTreeWidgetItem([name])
             self.addTopLevelItem(item)
             g = pyclbr.readmodule(module)
             for gate in g.keys():
@@ -111,7 +111,11 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
 class LgsipBasicGatesWidget(_LgsipGatesWidget):
     def __init__(self, parent=None):
         super(LgsipBasicGatesWidget, self).__init__(
-            ['IO', 'Basic', 'Compound'], parent
+            [
+                (QtGui.QApplication.translate('main', 'IO'), 'IO'),
+                (QtGui.QApplication.translate('main', 'Basic'), 'Basic'),
+                (QtGui.QApplication.translate('main', 'Compound'), 'Compound'),
+            ], parent
         )
 
 
