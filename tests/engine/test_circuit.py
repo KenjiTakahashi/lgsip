@@ -120,13 +120,6 @@ class TestSimpleCircuit(GateTest):
         self.a2.die()
         self.o.die()
         self.n.die()
-        self.i1.wait()
-        self.i2.wait()
-        self.i3.wait()
-        self.a1.wait()
-        self.a2.wait()
-        self.o.wait()
-        self.n.wait()
 
 
 class TestJKLatch(GateTest):
@@ -180,13 +173,6 @@ class TestJKLatch(GateTest):
         self.a2.die()
         self.n1.die()
         self.n2.die()
-        self.j.wait()
-        self.k.wait()
-        self.c.wait()
-        self.a1.wait()
-        self.a2.wait()
-        self.n1.wait()
-        self.n2.wait()
 
 
 from lgsip.engine.ic import IC
@@ -250,11 +236,3 @@ class TestIC(GateTest):
         self.o.die()
         self.n.die()
         self.out.die()
-        self.i1.wait()
-        self.i2.wait()
-        self.i3.wait()
-        self.a1.wait()
-        self.a2.wait()
-        self.o.wait()
-        self.n.wait()
-        self.out.wait()

@@ -168,7 +168,6 @@ class _LgsipScene(QtGui.QGraphicsScene):
                 pass
             else:
                 widget.die()
-                widget.wait()
             finally:
                 item.deleteLater()
 

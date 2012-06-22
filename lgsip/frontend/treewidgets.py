@@ -84,7 +84,6 @@ class _LgsipGatesWidget(QtGui.QTreeWidget):
         pixmap.fill(Qt.transparent)
         widget.render(pixmap, flags=QtGui.QWidget.DrawChildren)
         widget._gate.die()
-        widget._gate.wait()
         return pixmap
 
     def _expandCollapse(self, item):

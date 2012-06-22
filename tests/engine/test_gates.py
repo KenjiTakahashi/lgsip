@@ -40,7 +40,6 @@ class TestBinaryInput(object):
 
     def tearDown(self):
         self.i.die()
-        self.i.wait()
 
 
 class TestClock(GateTest):
@@ -64,7 +63,6 @@ class TestClock(GateTest):
 
     def tearDown(self):
         self.c.die()
-        self.c.wait()
 
 
 class _BasicGateTest(GateTest):
@@ -80,9 +78,6 @@ class _BasicGateTest(GateTest):
         self.i1.die()
         self.i2.die()
         self.g.die()
-        self.i1.wait()
-        self.i2.wait()
-        self.g.wait()
 
 
 class TestOr(_BasicGateTest):
@@ -297,5 +292,3 @@ class TestNot(GateTest):
     def tearDown(self):
         self.i.die()
         self.g.die()
-        self.i.wait()
-        self.g.wait()
