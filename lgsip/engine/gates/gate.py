@@ -47,6 +47,7 @@ class _Gate(QThread):
     def die(self):
         self._running = False
         self.wait()
+        self._running = True
 
     def addWire(self, gate, index):
         try:

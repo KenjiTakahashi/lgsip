@@ -39,6 +39,8 @@ class _LgsipPushButton(QtGui.QPushButton):
 
 
 class PlayPausePushButton(_LgsipPushButton):
+    bclicked = pyqtSignal(bool)
+
     def __init__(self, parent=None):
         super(PlayPausePushButton, self).__init__(parent)
         self.playPath = QtGui.QPainterPath()
@@ -46,25 +48,19 @@ class PlayPausePushButton(_LgsipPushButton):
             [QPointF(7, 7), QPointF(7, 17), QPointF(17, 12)])
         )
         self.pausePath = QtGui.QPainterPath()
-        self.pausePath.addRoundedRect(7, 7, 6, 16, 60, 20, Qt.RelativeSize)
-        self.pausePath.addRoundedRect(17, 7, 6, 16, 60, 20, Qt.RelativeSize)
-        self.path = self.playPath
+        self.pausePath.addRoundedRect(7, 7, 4, 10, 60, 20, Qt.RelativeSize)
+        self.pausePath.addRoundedRect(13, 7, 4, 10, 60, 20, Qt.RelativeSize)
+        self.path = self.pausePath
+        self.clicked.connect(self._clicked)
 
-    def setPlaying(self, state):
-        if state:
+    def _clicked(self):
+        value = self.path == self.playPath
+        if value:
             self.path = self.pausePath
         else:
             self.path = self.playPath
         self.update()
-
-    def isPlaying(self):
-        return self.path != self.playPath
-
-
-class StopPushButton(_LgsipPushButton):
-    def __init__(self, parent=None):
-        super(StopPushButton, self).__init__(parent)
-        self.path.addRoundedRect(7, 7, 10, 10, 60, 60, Qt.RelativeSize)
+        self.bclicked.emit(value)
 
 
 class AddPushButton(_LgsipPushButton):
@@ -121,7 +117,6 @@ class _LgsipTabBarButtons(QtGui.QWidget):
         super(_LgsipTabBarButtons, self).__init__(parent)
         self.widget = widget
         self.start = PlayPausePushButton()
-        self.stop = StopPushButton()
         self.close = ClosePushButton()
         self.close.clicked.connect(self._closeClicked)
         self.save = SavePushButton()
@@ -131,7 +126,6 @@ class _LgsipTabBarButtons(QtGui.QWidget):
         layout.addWidget(self.load)
         layout.addWidget(self.save)
         layout.addWidget(self.start)
-        layout.addWidget(self.stop)
         layout.addWidget(self.close)
         self.setLayout(layout)
 
@@ -160,6 +154,7 @@ class LgsipTabWidget(QtGui.QTabWidget):
         buttons.closeClicked.connect(self.removeTab)
         buttons.load.clicked.connect(widget.load)
         buttons.save.clicked.connect(widget.save)
+        buttons.start.bclicked.connect(widget.pause)
         self.tabBar().setTabButton(index, QtGui.QTabBar.RightSide, buttons)
         self.setCurrentIndex(index)
 

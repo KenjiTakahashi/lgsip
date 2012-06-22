@@ -357,6 +357,18 @@ class SketchBoard(QtGui.QGraphicsView):
             scene.clean()
             module.load(scene)
 
+    def pause(self, b):
+        for item in self.items():
+            try:
+                widget = item.widget()._gate
+            except AttributeError:
+                pass
+            else:
+                if b:
+                    widget.start()
+                else:
+                    widget.die()
+
     def dragEnterEvent(self, event):
         data = event.mimeData()
         if(data.hasFormat('lgsip/x-classname')
