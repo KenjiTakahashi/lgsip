@@ -160,6 +160,18 @@ class _LgsipScene(QtGui.QGraphicsScene):
         self._rubber = _RubberBand()
         self._rubber_ = False
 
+    def clean(self):
+        for item in self.items():
+            try:
+                widget = item.widget()._gate
+            except AttributeError:
+                pass
+            else:
+                widget.die()
+                widget.wait()
+            finally:
+                item.deleteLater()
+
     def dropEvent(self, event):
         data = event.mimeData()
         filename = data.data('lgsip/x-filename')
@@ -342,7 +354,9 @@ class SketchBoard(QtGui.QGraphicsView):
         if result:
             filename = dialog.selectedFiles()[0]
             module = imp.load_source("circuit", filename)
-            module.load(self.scene())
+            scene = self.scene()
+            scene.clean()
+            module.load(scene)
 
     def dragEnterEvent(self, event):
         data = event.mimeData()
