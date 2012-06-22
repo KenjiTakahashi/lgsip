@@ -20,7 +20,7 @@ from setuptools import setup
 setup(
     name='lgsip',
     version='0.1',
-    description='A logic gate simulator in python.',
+    description='Logic Gate Simulator In Python.',
     long_description=open('README.rst').read(),
     author='Karol "Kenji Takahashi" Woźniak',
     author_email='wozniakk@gmail.com',
@@ -28,19 +28,15 @@ setup(
     url='http://github.com/KenjiTakahashi/lgsip',
     packages=[
         'lgsip',
-        'lgsip.interfaces',
-        'lgsip.db',
-        'lgsip.db.bees',
-        'lgsip.plugins'
+        'lgsip.engine',
+        'lgsip.engine.gates',
+        'lgsip.frontend',
+        'lgsip.frontend.gates'
     ],
     package_data={
         '': ['langs/*.qm', '*/*.rst']
     },
     scripts=['scripts/lgsip'],
-    install_requires=[
-    ],
-    extras_require={
-    },
     classifiers=[f.strip() for f in """
     Development Status :: 4 - Beta
     Environment :: Win32 (MS Windows)
