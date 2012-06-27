@@ -33,7 +33,7 @@ class _Gate(QThread):
 
     def run(self):
         while self._running:
-            self.msleep(1)
+            self.msleep(10)
             value = self.compute()
             if value != self._value:
                 self.outValueChanged.emit(0, value)
@@ -49,7 +49,7 @@ class _Gate(QThread):
         self.wait()
         self._running = True
 
-    def addWire(self, gate, index):
+    def addWire(self, gate, index, _=0):
         try:
             if gate.__class__.__name__ == 'IC':
                 for conn in gate.wire(index):
@@ -59,7 +59,7 @@ class _Gate(QThread):
         except IndexError:
             raise lgsiperr.InvalidInputIndexError
 
-    def removeWire(self, gate, index):
+    def removeWire(self, gate, index, _=0):
         try:
             self._gates.remove((gate, index))
             gate.changeInput(index, False)

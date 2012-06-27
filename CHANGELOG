@@ -1,2 +1,7 @@
 === 0.1:
 -initial rls with basic functionality
+
+=== 0.1.1:
+-fixed removing wires from complex gates
+-fixed connnections between complex gates
+-lowered CPU usage a bit (still needs work, though)

@@ -88,7 +88,7 @@ class WireButton(_LgsipGateButton):
     def addStartWire(self, wire, gate=None):
         self._swires.append(wire)
         if gate:
-            self.parent().connect(wire._endParent, gate, False)
+            self.parent().connect(self, wire._endParent, gate, False)
 
     def addEndWire(self, wire, gate=None):
         """Adds a wire that ends in this input/output.
@@ -99,7 +99,7 @@ class WireButton(_LgsipGateButton):
         """
         self._ewires.append(wire)
         if gate:
-            self.parent().connect(self, gate, True)
+            self.parent().connect(wire._startParent, self, gate, True)
 
     def cancelWire(self, wire):
         self._swires.remove(wire)
@@ -116,13 +116,17 @@ class WireButton(_LgsipGateButton):
 
     def deleteWires(self):
         for wire in self._swires:
-            wire._startParent.parent().disconnect(wire._endParent)
+            wire._startParent.parent().disconnect(
+                wire._startParent, wire._endParent
+            )
             wire.deleteLater()
         self.deleteEWires()
 
     def deleteEWires(self):
         for wire in self._ewires:
-            wire._startParent.parent().disconnect(wire._endParent)
+            wire._startParent.parent().disconnect(
+                wire._startParent, wire._endParent
+            )
             wire.deleteLater()
 
 
@@ -258,15 +262,24 @@ class Gate(QtGui.QWidget):
     def setOutPropagating(self, i, value):
         self._outbuttons[i].setPropagating(value)
 
-    def connect(self, wire, gate, flag):
+    def connect(self, sender, wire, gate, flag):
         if flag:
-            gate._gate.addWire(self._gate, self._inbuttons.index(wire))
+            gate._gate.addWire(
+                self._gate, self._inbuttons.index(wire),
+                gate._outbuttons.index(sender)
+            )
         else:
-            self._gate.addWire(gate._gate, gate._inbuttons.index(wire))
+            self._gate.addWire(
+                gate._gate, gate._inbuttons.index(wire),
+                self._outbuttons.index(sender)
+            )
 
-    def disconnect(self, wire):
+    def disconnect(self, sender, wire):
         gate = wire.parent()
-        self._gate.removeWire(gate._gate, gate._inbuttons.index(wire))
+        self._gate.removeWire(
+            gate._gate, gate._inbuttons.index(wire),
+            self._outbuttons.index(sender)
+        )
 
     def moveWires(self, pos=None):
         if not pos:

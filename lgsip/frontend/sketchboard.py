@@ -84,7 +84,9 @@ class Wire(QtGui.QGraphicsObject):
         super(Wire, self).mousePressEvent(event)
         if event.button() == Qt.RightButton:
             if self._endParent:
-                self._startParent.parent().disconnect(self._endParent)
+                self._startParent.parent().disconnect(
+                    self._startParent, self._endParent
+                )
             self.deleteLater()
 
     def mouseMoveEvent(self, event):

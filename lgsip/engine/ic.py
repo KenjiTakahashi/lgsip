@@ -76,9 +76,19 @@ class IC(QObject):
         if index != -1:
             self.outValueChanged.emit(index, value)
 
-    def addWire(self, gate, output, input):
+    def addWire(self, gate, input, output):
         for _output in self._outputs[output]:
-            _output.addWire(gate, input)
+            try:
+                _output.addWire(gate, input)
+            except AttributeError:
+                _output[0].addWire(gate, input)
+
+    def removeWire(self, gate, index, output):
+        for _output in self._outputs[output]:
+            try:
+                _output.removeWire(gate, index)
+            except AttributeError:
+                _output[0].removeWire(gate, index)
 
     def wire(self, index):
         return self._inputs[index]
